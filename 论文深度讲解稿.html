@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>推荐曝光结构外部性审计：论文深度讲解稿</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f2ece0;
+      --bg-strong: #faf5eb;
+      --surface: rgba(255, 251, 245, 0.86);
+      --surface-strong: rgba(255, 255, 255, 0.92);
+      --line: rgba(68, 52, 36, 0.12);
+      --line-strong: rgba(68, 52, 36, 0.24);
+      --text: #221a13;
+      --text-muted: #61584d;
+      --text-soft: #867a6d;
+      --accent: #9a5930;
+      --accent-deep: #6d3716;
+      --accent-alt: #214f4b;
+      --shadow: 0 24px 70px rgba(67, 44, 23, 0.1);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(154, 89, 48, 0.14), transparent 28%),
+        radial-gradient(circle at 100% 10%, rgba(33, 79, 75, 0.12), transparent 26%),
+        linear-gradient(180deg, #f7f0e4 0%, #f2ece0 54%, #faf5eb 100%);
+      font-family: "Manrope", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page-shell {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px 24px 64px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(247, 240, 228, 0.78);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: grid;
+      gap: 4px;
+    }
+
+    .brand-kicker {
+      color: var(--accent-alt);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .brand-title {
+      font-family: "Noto Serif SC", Georgia, serif;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .top-link,
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .top-link:hover,
+    .theme-toggle:hover {
+      transform: translateY(-1px);
+      border-color: rgba(154, 89, 48, 0.24);
+      color: var(--accent-deep);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    .hero-main,
+    .hero-side,
+    .content-area,
+    .toc-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-main,
+    .hero-side,
+    .toc-panel {
+      padding: 24px;
+    }
+
+    .hero-main h1 {
+      margin: 0;
+      font-family: "Noto Serif SC", Georgia, serif;
+      font-size: clamp(34px, 4.6vw, 60px);
+      line-height: 1.04;
+    }
+
+    .hero-main p {
+      margin: 14px 0 0;
+      max-width: 60rem;
+      color: var(--text-muted);
+      line-height: 1.85;
+    }
+
+    .hero-kicker {
+      margin: 0 0 12px;
+      color: var(--accent-alt);
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .stat-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .stat-card {
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.74);
+    }
+
+    .stat-label {
+      color: var(--text-soft);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      margin-top: 8px;
+      color: var(--accent-deep);
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .stat-note {
+      margin-top: 8px;
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .quick-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 15px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(154, 89, 48, 0.96), rgba(109, 55, 22, 0.96));
+      color: #fffdf8;
+      text-decoration: none;
+      font-size: 13px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .quick-link.alt {
+      background: rgba(33, 79, 75, 0.1);
+      color: var(--accent-alt);
+    }
+
+    .quick-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 34px rgba(109, 55, 22, 0.16);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .content-area {
+      padding: 28px;
+    }
+
+    .doc-block + .doc-block {
+      margin-top: 34px;
+      padding-top: 34px;
+      border-top: 1px solid rgba(68, 52, 36, 0.08);
+    }
+
+    .doc-header {
+      margin-bottom: 18px;
+    }
+
+    .doc-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .doc-kicker::before {
+      content: "";
+      width: 26px;
+      height: 1px;
+      background: currentColor;
+    }
+
+    .doc-header h2 {
+      margin: 0;
+      font-family: "Noto Serif SC", Georgia, serif;
+      font-size: 30px;
+      line-height: 1.15;
+    }
+
+    .doc-header p {
+      margin: 10px 0 0;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .toc-panel {
+      position: sticky;
+      top: 102px;
+    }
+
+    .toc-panel h3 {
+      margin: 0 0 14px;
+      font-size: 15px;
+    }
+
+    .toc-links {
+      display: grid;
+      gap: 8px;
+    }
+
+    .toc-link {
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.5;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .toc-link:hover,
+    .toc-link.active {
+      border-color: rgba(154, 89, 48, 0.22);
+      background: rgba(255, 248, 239, 0.86);
+      color: var(--accent-deep);
+    }
+
+    .toc-sub {
+      margin-left: 14px;
+      font-size: 12px;
+    }
+
+    .prose {
+      color: var(--text);
+      line-height: 1.85;
+    }
+
+    .prose h1,
+    .prose h2,
+    .prose h3 {
+      font-family: "Noto Serif SC", Georgia, serif;
+      scroll-margin-top: 120px;
+    }
+
+    .prose h1 {
+      margin: 0 0 22px;
+      font-size: 38px;
+      line-height: 1.12;
+    }
+
+    .prose h2 {
+      margin: 28px 0 12px;
+      font-size: 28px;
+      line-height: 1.18;
+    }
+
+    .prose h3 {
+      margin: 22px 0 10px;
+      font-size: 20px;
+      line-height: 1.28;
+    }
+
+    .prose p {
+      margin: 0 0 14px;
+      color: var(--text-muted);
+    }
+
+    .prose ul,
+    .prose ol {
+      margin: 0 0 18px;
+      padding-left: 1.3rem;
+      color: var(--text-muted);
+    }
+
+    .prose li + li {
+      margin-top: 8px;
+    }
+
+    .prose blockquote {
+      margin: 0 0 18px;
+      padding: 16px 18px;
+      border-left: 3px solid rgba(154, 89, 48, 0.32);
+      border-radius: 0 16px 16px 0;
+      background: rgba(255, 248, 239, 0.78);
+      color: var(--text);
+    }
+
+    .prose pre {
+      margin: 0 0 18px;
+      padding: 16px;
+      overflow-x: auto;
+      border-radius: 18px;
+      background: #271d17;
+      color: #f9efe5;
+    }
+
+    .prose code {
+      padding: 0.18em 0.42em;
+      border-radius: 8px;
+      background: rgba(33, 79, 75, 0.09);
+      color: var(--accent-alt);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.92em;
+    }
+
+    .prose pre code {
+      padding: 0;
+      background: transparent;
+      color: inherit;
+    }
+
+    .footer {
+      margin-top: 28px;
+      color: var(--text-soft);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 1080px) {
+      .hero,
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .toc-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page-shell {
+        padding: 18px 14px 48px;
+      }
+
+      .topbar {
+        border-radius: 22px;
+      }
+
+      .content-area,
+      .hero-main,
+      .hero-side,
+      .toc-panel {
+        padding: 20px;
+      }
+    }
+
+    body[data-theme="night"] {
+      --bg: #131211;
+      --bg-strong: #1c1a18;
+      --surface: rgba(27, 24, 22, 0.86);
+      --surface-strong: rgba(32, 29, 26, 0.94);
+      --line: rgba(255, 240, 223, 0.1);
+      --line-strong: rgba(255, 240, 223, 0.2);
+      --text: #f5eee6;
+      --text-muted: #c9bdb0;
+      --text-soft: #988b7f;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.34);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-kicker">Showtime HTML</div>
+        <div class="brand-title">推荐曝光结构外部性审计：论文深度讲解稿</div>
+      </div>
+      <div class="top-actions">
+        <a class="top-link" href="index.html">合并页</a>
+        <a class="top-link" href="论文深度讲解稿.html">主讲稿</a>
+        <a class="top-link" href="技术解释文档.html">技术解释</a>
+        <button class="theme-toggle" id="themeToggle" type="button">主题切换</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <article class="hero-main">
+        <p class="hero-kicker">Talk Script</p>
+        <h1>推荐曝光结构外部性审计：论文深度讲解稿</h1>
+        <p>主讲页聚焦论文主命题、对象层重写、方法链与解释边界，结果图表在实验完成后按既定版式接入。</p>
+        <div class="quick-links">
+          <a class="quick-link" href="index.html">合并部署页</a>
+<a class="quick-link" href="论文深度讲解稿.html">主讲稿 HTML</a>
+<a class="quick-link" href="技术解释文档.html">技术解释 HTML</a>
+<a class="quick-link alt" href="https://2711944586.github.io/paperpages/#/paper">论文网站</a>
+<a class="quick-link alt" href="https://2711944586.github.io/mindmap/research_journey.html">研究导图</a>
+        </div>
+      </article>
+      <aside class="hero-side">
+        <div class="stat-grid">
+          
+      <div class="stat-card">
+        <div class="stat-label">页面类型</div>
+        <div class="stat-value">主讲稿</div>
+        <div class="stat-note">面向汇报、预演和公开展示。</div>
+      </div>
+      
+
+      <div class="stat-card">
+        <div class="stat-label">论文版本</div>
+        <div class="stat-value">最新原稿已同步</div>
+        <div class="stat-note">对象层、方法链与评估协议全部对齐。</div>
+      </div>
+      
+
+      <div class="stat-card">
+        <div class="stat-label">配套资料</div>
+        <div class="stat-value">2 份技术解释</div>
+        <div class="stat-note">对象结构与理论评估分开补充。</div>
+      </div>
+      
+        </div>
+      </aside>
+    </section>
+
+    <section class="layout">
+      <main class="content-area">
+        
+  <section class="doc-block" id="lecture">
+    <div class="doc-header">
+      <span class="doc-kicker">Talk Script</span>
+      <h2>论文深度讲解稿</h2>
+      <p>面向汇报、答辩预演和公开展示的主讲线。</p>
+    </div>
+    <article class="prose">
+      <h1 id="lecture-tsfb-tshm-secr-论文深度讲解稿">TSFB-TSHM-SECR 论文深度讲解稿</h1>
+<blockquote>对应论文：<code>../paper_ipm_main.md</code> 对应交互网站：<code>../04_交互网站/</code> 对应思维导图：<code>../05_思维导图/research_journey.html</code></blockquote>
+<h2 id="lecture-1-开场命题">1. 开场命题</h2>
+<p>这篇论文讨论的不是一次性的排序表现，而是推荐系统如何在重复可见性分配中持续塑造局部曝光结构。平台每次响应请求，都会把有限注意力重新分配给不同生产者；这些分配在时间窗口内累积成动态曝光图，并在三元组邻域中诱导方向性循环、跨群体隔离、时间持续性和放大集中四类结构条件。整场汇报围绕这条主线展开。</p>
+<h2 id="lecture-2-研究对象的重写">2. 研究对象的重写</h2>
+<p>论文首先改写研究对象。社交关系图描述的是潜在连接，互动图混合了平台曝光和用户反应，而平台真正控制的是请求到来时的推荐列表。因此，论文把研究对象从静态关系网络转成重复分配后形成的曝光结构，并把全文拆成三个层次：</p>
+<ol><li>行动层：请求、候选集、推荐列表。</li><li>审计层：时间窗口内诱导的动态曝光图。</li><li>诊断层：曝光图上的三元组结构条件。</li></ol>
+<p>这一改写决定了后面的理论、方法和评估都围绕分配过程展开，而不是围绕态度结果展开。</p>
+<h2 id="lecture-3-四个研究缺口">3. 四个研究缺口</h2>
+<p>论文聚焦四个缺口。第一，现有审计工具大多停留在二元层，难以稳定识别局部方向性闭环。第二，固定权重指数容易被活跃度计数这类强基线匹配甚至超过，诊断必须转向数据驱动和校准化。第三，真实系统在请求和列表层上运作，仅在用户聚合层分析会丢失位置偏差与列表组成效应。第四，如果重排序器只最小化自身输出，评估链路就会变成自证闭环，因此诊断目标、标签定义和策略评估必须分开。</p>
+<h2 id="lecture-4-为什么选择三元组">4. 为什么选择三元组</h2>
+<p>三元组是当前框架中最小的高阶可计算单元。边级失衡可以回答“谁比谁更容易被看见”，但只有进入三元组，才能同时描述共同暴露、方向性不对称和局部闭环回流。Hodge 分解中的局部旋度分量只会在三角边界上显现，这意味着三元组层天然包含二元势流分析不可恢复的独立信息。</p>
+<h2 id="lecture-5-tsfb-三元组结构特征库">5. TSFB：三元组结构特征库</h2>
+<p>TSFB 把诊断拆成核心结构层和背景控制层。核心结构层对应四个机制对齐的特征：</p>
+<ul><li><code>C</code>：方向性循环，刻画局部非势流闭合。</li><li><code>I</code>：跨群体隔离，刻画三元组边界上的群体混合程度。</li><li><code>P</code>：时间持续性，区分一次性扰动与结构锁定。</li><li><code>A</code>：放大集中，识别曝光是否压在少数边上形成单向主导。</li></ul>
+<p>背景控制层吸收活跃度、局部体量、度不对称和列表上下文等非结构性变异。TSFB 的意义不在于制造一个新的手工总分，而在于把结构信号与强控制基线放入同一诊断框架中比较，验证结构层是否真的带来增量价值。</p>
+<h2 id="lecture-6-tshm-多任务校准风险模型">6. TSHM：多任务校准风险模型</h2>
+<p>TSHM 接收 TSFB 输出的特征向量，但预测目标不是四个结构分量的线性组合，而是三类独立定义的负面分配事件：结构性事件、分布性事件和复合性事件。这样做的关键价值在于，风险标签和输入特征在公式上被明确拆开，模型输出的是可校准的事件概率，而不是对结构指标的再次包装。</p>
+<p>TSHM 的表达重点有两个。第一，方向明确的输入可以施加单调约束，保证模型与机制假设对齐。第二，输出必须经过校准，才能作为审计触发器进入后续决策。论文承认标签和特征共享同一分配过程，但把这种共享过程依赖显式写入评估报告，而不是把它伪装成完全独立。</p>
+<h2 id="lecture-7-secr-结构性外部性约束重排序">7. SECR：结构性外部性约束重排序</h2>
+<p>SECR 把结构风险重新接回列表级动作空间。它不是在聚合图上做抽象修补，而是在候选集中逐位置选择项目，同时平衡效用、提供者公平和结构性外部性惩罚。位置贪心、局部增量风险近似和邻域截断共同保证了方法可执行，也决定了它是一种受约束、结构保持、可审计的干预原型，而不是福利最优器。</p>
+<h2 id="lecture-8-理论部分的作用">8. 理论部分的作用</h2>
+<p>论文的理论部分解决三件必要的可信度问题。命题 1 说明三元组层确实存在二元分析看不见的信息盲区；命题 2 给出受限条件下位置贪心的合理操作区间；命题 3 则把推断范围明确限制在结构条件层，不把风险分数扩展成态度变化或福利改善的因果证据。理论部分的价值在于限定方法能说什么，而不是夸大它已经证明了什么。</p>
+<h2 id="lecture-9-评估协议">9. 评估协议</h2>
+<p>现阶段网页和讲稿先按协议组织，不提前固化结果数值。评估采用三层证据架构：</p>
+<ol><li>公开日志数据评估：MIND、FINN.no Slates、KuaiRand。</li><li>机制隔离仿真：四类生成器失配压力测试。</li><li>历史重放：提供方向一致性和外部边界参考。</li></ol>
+<p>诊断侧关注 ROC AUC、PR AUC、Brier、ECE 和特征消融；策略侧关注 NDCG@K、提供者公平差距、用户公平差距、覆盖率、结构风险降幅和策略距离。失败判据同样前置写入协议：不能显著超过 ActivityCount、移除核心结构层后性能几乎不变、风险下降代价过高、校准误差超过阈值，这些情况都会直接削弱论文主张。</p>
+<h2 id="lecture-10-当前的解释边界">10. 当前的解释边界</h2>
+<p>当前版本最重要的边界有三条。第一，结构风险下降不等于态度改善。第二，结构信号不是现实平台治理的最终答案。第三，历史重放和仿真结果不能替代线上随机实验。这三条边界越清楚，论文作为方法稿就越稳。</p>
+<h2 id="lecture-11-图表与结果页的接入顺序">11. 图表与结果页的接入顺序</h2>
+<p>结果图表完成后，页面将按统一顺序接入：框架总览图、三层对象图、TSFB 四分量机制图、TSHM 标签与校准结果、SECR 列表级干预流程图、三层证据总览图，以及正式实验结果图和消融图。当前讲解页只保留这套叙事骨架，不提前写死尚未冻结的数值。</p>
+<h2 id="lecture-12-收束口径">12. 收束口径</h2>
+<p>这篇论文提供的不是“现实平台回音室问题的终局答案”，而是一套面向推荐曝光分配的结构风险审计框架。它把对象定义、风险诊断、列表级干预和解释边界写成完整链路；等实验结果和图形资产完成后，交互网站、研究导图和讲解页可以在不改主结构的前提下继续接入结果层内容。</p>
+    </article>
+  </section>
+  
+      </main>
+      <aside class="toc-panel">
+        <h3>目录导航</h3>
+        <div class="toc-links">
+          <a class="toc-link " href="#lecture">论文深度讲解稿</a>
+<a class="toc-link " href="#lecture-1-开场命题">1. 开场命题</a>
+<a class="toc-link " href="#lecture-2-研究对象的重写">2. 研究对象的重写</a>
+<a class="toc-link " href="#lecture-3-四个研究缺口">3. 四个研究缺口</a>
+<a class="toc-link " href="#lecture-4-为什么选择三元组">4. 为什么选择三元组</a>
+<a class="toc-link " href="#lecture-5-tsfb-三元组结构特征库">5. TSFB：三元组结构特征库</a>
+<a class="toc-link " href="#lecture-6-tshm-多任务校准风险模型">6. TSHM：多任务校准风险模型</a>
+<a class="toc-link " href="#lecture-7-secr-结构性外部性约束重排序">7. SECR：结构性外部性约束重排序</a>
+<a class="toc-link " href="#lecture-8-理论部分的作用">8. 理论部分的作用</a>
+<a class="toc-link " href="#lecture-9-评估协议">9. 评估协议</a>
+<a class="toc-link " href="#lecture-10-当前的解释边界">10. 当前的解释边界</a>
+<a class="toc-link " href="#lecture-11-图表与结果页的接入顺序">11. 图表与结果页的接入顺序</a>
+<a class="toc-link " href="#lecture-12-收束口径">12. 收束口径</a>
+        </div>
+      </aside>
+    </section>
+
+    <div class="footer">静态构建页由 <code>build_showtime_site.py</code> 生成，可直接部署到 GitHub Pages。</div>
+  </div>
+
+  <script>
+    const key = "showtime-theme";
+    const toggle = document.getElementById("themeToggle");
+    const saved = localStorage.getItem(key);
+    if (saved === "night") document.body.dataset.theme = "night";
+    toggle.addEventListener("click", () => {
+      document.body.dataset.theme = document.body.dataset.theme === "night" ? "" : "night";
+      localStorage.setItem(key, document.body.dataset.theme === "night" ? "night" : "day");
+    });
+
+    const links = Array.from(document.querySelectorAll(".toc-link"));
+    const sections = links
+      .map((link) => document.querySelector(link.getAttribute("href")))
+      .filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.id}`);
+      });
+    }, { rootMargin: "-30% 0px -55% 0px", threshold: [0.1, 0.3, 0.6] });
+    sections.forEach((section) => observer.observe(section));
+  </script>
+</body>
+</html>

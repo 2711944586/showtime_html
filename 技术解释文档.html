@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>推荐曝光结构外部性审计：技术解释手册</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f2ece0;
+      --bg-strong: #faf5eb;
+      --surface: rgba(255, 251, 245, 0.86);
+      --surface-strong: rgba(255, 255, 255, 0.92);
+      --line: rgba(68, 52, 36, 0.12);
+      --line-strong: rgba(68, 52, 36, 0.24);
+      --text: #221a13;
+      --text-muted: #61584d;
+      --text-soft: #867a6d;
+      --accent: #9a5930;
+      --accent-deep: #6d3716;
+      --accent-alt: #214f4b;
+      --shadow: 0 24px 70px rgba(67, 44, 23, 0.1);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(154, 89, 48, 0.14), transparent 28%),
+        radial-gradient(circle at 100% 10%, rgba(33, 79, 75, 0.12), transparent 26%),
+        linear-gradient(180deg, #f7f0e4 0%, #f2ece0 54%, #faf5eb 100%);
+      font-family: "Manrope", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page-shell {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px 24px 64px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(247, 240, 228, 0.78);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: grid;
+      gap: 4px;
+    }
+
+    .brand-kicker {
+      color: var(--accent-alt);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .brand-title {
+      font-family: "Noto Serif SC", Georgia, serif;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .top-link,
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .top-link:hover,
+    .theme-toggle:hover {
+      transform: translateY(-1px);
+      border-color: rgba(154, 89, 48, 0.24);
+      color: var(--accent-deep);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    .hero-main,
+    .hero-side,
+    .content-area,
+    .toc-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-main,
+    .hero-side,
+    .toc-panel {
+      padding: 24px;
+    }
+
+    .hero-main h1 {
+      margin: 0;
+      font-family: "Noto Serif SC", Georgia, serif;
+      font-size: clamp(34px, 4.6vw, 60px);
+      line-height: 1.04;
+    }
+
+    .hero-main p {
+      margin: 14px 0 0;
+      max-width: 60rem;
+      color: var(--text-muted);
+      line-height: 1.85;
+    }
+
+    .hero-kicker {
+      margin: 0 0 12px;
+      color: var(--accent-alt);
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .stat-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .stat-card {
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.74);
+    }
+
+    .stat-label {
+      color: var(--text-soft);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      margin-top: 8px;
+      color: var(--accent-deep);
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .stat-note {
+      margin-top: 8px;
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .quick-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 15px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(154, 89, 48, 0.96), rgba(109, 55, 22, 0.96));
+      color: #fffdf8;
+      text-decoration: none;
+      font-size: 13px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .quick-link.alt {
+      background: rgba(33, 79, 75, 0.1);
+      color: var(--accent-alt);
+    }
+
+    .quick-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 34px rgba(109, 55, 22, 0.16);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .content-area {
+      padding: 28px;
+    }
+
+    .doc-block + .doc-block {
+      margin-top: 34px;
+      padding-top: 34px;
+      border-top: 1px solid rgba(68, 52, 36, 0.08);
+    }
+
+    .doc-header {
+      margin-bottom: 18px;
+    }
+
+    .doc-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .doc-kicker::before {
+      content: "";
+      width: 26px;
+      height: 1px;
+      background: currentColor;
+    }
+
+    .doc-header h2 {
+      margin: 0;
+      font-family: "Noto Serif SC", Georgia, serif;
+      font-size: 30px;
+      line-height: 1.15;
+    }
+
+    .doc-header p {
+      margin: 10px 0 0;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .toc-panel {
+      position: sticky;
+      top: 102px;
+    }
+
+    .toc-panel h3 {
+      margin: 0 0 14px;
+      font-size: 15px;
+    }
+
+    .toc-links {
+      display: grid;
+      gap: 8px;
+    }
+
+    .toc-link {
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.5;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .toc-link:hover,
+    .toc-link.active {
+      border-color: rgba(154, 89, 48, 0.22);
+      background: rgba(255, 248, 239, 0.86);
+      color: var(--accent-deep);
+    }
+
+    .toc-sub {
+      margin-left: 14px;
+      font-size: 12px;
+    }
+
+    .prose {
+      color: var(--text);
+      line-height: 1.85;
+    }
+
+    .prose h1,
+    .prose h2,
+    .prose h3 {
+      font-family: "Noto Serif SC", Georgia, serif;
+      scroll-margin-top: 120px;
+    }
+
+    .prose h1 {
+      margin: 0 0 22px;
+      font-size: 38px;
+      line-height: 1.12;
+    }
+
+    .prose h2 {
+      margin: 28px 0 12px;
+      font-size: 28px;
+      line-height: 1.18;
+    }
+
+    .prose h3 {
+      margin: 22px 0 10px;
+      font-size: 20px;
+      line-height: 1.28;
+    }
+
+    .prose p {
+      margin: 0 0 14px;
+      color: var(--text-muted);
+    }
+
+    .prose ul,
+    .prose ol {
+      margin: 0 0 18px;
+      padding-left: 1.3rem;
+      color: var(--text-muted);
+    }
+
+    .prose li + li {
+      margin-top: 8px;
+    }
+
+    .prose blockquote {
+      margin: 0 0 18px;
+      padding: 16px 18px;
+      border-left: 3px solid rgba(154, 89, 48, 0.32);
+      border-radius: 0 16px 16px 0;
+      background: rgba(255, 248, 239, 0.78);
+      color: var(--text);
+    }
+
+    .prose pre {
+      margin: 0 0 18px;
+      padding: 16px;
+      overflow-x: auto;
+      border-radius: 18px;
+      background: #271d17;
+      color: #f9efe5;
+    }
+
+    .prose code {
+      padding: 0.18em 0.42em;
+      border-radius: 8px;
+      background: rgba(33, 79, 75, 0.09);
+      color: var(--accent-alt);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.92em;
+    }
+
+    .prose pre code {
+      padding: 0;
+      background: transparent;
+      color: inherit;
+    }
+
+    .footer {
+      margin-top: 28px;
+      color: var(--text-soft);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 1080px) {
+      .hero,
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .toc-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page-shell {
+        padding: 18px 14px 48px;
+      }
+
+      .topbar {
+        border-radius: 22px;
+      }
+
+      .content-area,
+      .hero-main,
+      .hero-side,
+      .toc-panel {
+        padding: 20px;
+      }
+    }
+
+    body[data-theme="night"] {
+      --bg: #131211;
+      --bg-strong: #1c1a18;
+      --surface: rgba(27, 24, 22, 0.86);
+      --surface-strong: rgba(32, 29, 26, 0.94);
+      --line: rgba(255, 240, 223, 0.1);
+      --line-strong: rgba(255, 240, 223, 0.2);
+      --text: #f5eee6;
+      --text-muted: #c9bdb0;
+      --text-soft: #988b7f;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.34);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-kicker">Showtime HTML</div>
+        <div class="brand-title">推荐曝光结构外部性审计：技术解释手册</div>
+      </div>
+      <div class="top-actions">
+        <a class="top-link" href="index.html">合并页</a>
+        <a class="top-link" href="论文深度讲解稿.html">主讲稿</a>
+        <a class="top-link" href="技术解释文档.html">技术解释</a>
+        <button class="theme-toggle" id="themeToggle" type="button">主题切换</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <article class="hero-main">
+        <p class="hero-kicker">Technical Companion</p>
+        <h1>推荐曝光结构外部性审计：技术解释手册</h1>
+        <p>技术解释页把对象层、方法链、理论命题与评估协议拆开讲，适合统一研究口径、答疑和对外说明。</p>
+        <div class="quick-links">
+          <a class="quick-link" href="index.html">合并部署页</a>
+<a class="quick-link" href="论文深度讲解稿.html">主讲稿 HTML</a>
+<a class="quick-link" href="技术解释文档.html">技术解释 HTML</a>
+<a class="quick-link alt" href="https://2711944586.github.io/paperpages/#/paper">论文网站</a>
+<a class="quick-link alt" href="https://2711944586.github.io/mindmap/research_journey.html">研究导图</a>
+        </div>
+      </article>
+      <aside class="hero-side">
+        <div class="stat-grid">
+          
+      <div class="stat-card">
+        <div class="stat-label">页面类型</div>
+        <div class="stat-value">技术解释</div>
+        <div class="stat-note">适合方法与评估口径统一。</div>
+      </div>
+      
+
+      <div class="stat-card">
+        <div class="stat-label">技术文档</div>
+        <div class="stat-value">2 份</div>
+        <div class="stat-note">对象结构与理论评估分别展开。</div>
+      </div>
+      
+
+      <div class="stat-card">
+        <div class="stat-label">部署方式</div>
+        <div class="stat-value">静态单页</div>
+        <div class="stat-note">可直接托管到 GitHub Pages。</div>
+      </div>
+      
+        </div>
+      </aside>
+    </section>
+
+    <section class="layout">
+      <main class="content-area">
+        
+  <section class="doc-block" id="method">
+    <div class="doc-header">
+      <span class="doc-kicker">Technical Note 01</span>
+      <h2>技术解释一：对象、结构与方法</h2>
+      <p>解释对象层、曝光图构造、TSFB、TSHM 与 SECR。</p>
+    </div>
+    <article class="prose">
+      <h1 id="method-技术解释一-对象-结构与方法">技术解释一：对象、结构与方法</h1>
+<h2 id="method-1-三层对象为什么必须分开">1. 三层对象为什么必须分开</h2>
+<p>这篇论文最重要的结构安排，是把行动对象、审计对象和诊断对象彻底拆开。行动对象是请求、候选集和推荐列表；审计对象是时间窗口内累积形成的动态曝光图；诊断对象是曝光图上的三元组结构条件。这样的拆分避免了最常见的对象混淆。平台真正控制的是列表级分配，而不是用户态度；审计者真正能观察的是分配诱导出的结构，而不是心理结果本身。</p>
+<h2 id="method-2-动态曝光图如何构造">2. 动态曝光图如何构造</h2>
+<p>动态曝光图来自列表级日志，而不是来自社交关系。对每次请求，系统从候选集中给出前 <code>K</code> 个项目；每个位置贡献一个位置折扣后的曝光量 <code>e_(r,k)</code>；在固定时间窗口内，把用户 <code>i</code> 对创作者 <code>j</code> 的累计曝光聚合成有向边权 <code>f_t(i,j)</code>。因此，曝光图的每条边都表示可见性分配的历史累积，而不是社交连接或互动结果。</p>
+<h2 id="method-3-为什么诊断单元是三元组">3. 为什么诊断单元是三元组</h2>
+<p>二元分析只能处理成对不平衡，难以稳定描述局部方向性闭环。三元组则同时容纳共同暴露、方向性不对称和局部回流，是当前框架中最小的高阶可计算单元。Hodge 分解中的局部旋度只会在三角边界上显现，这就是三元组的理论意义，也是论文坚持从三元组而不是从边级定义结构条件的原因。</p>
+<h2 id="method-4-tsfb-的两层结构">4. TSFB 的两层结构</h2>
+<p>TSFB 由核心结构层和背景控制层组成。核心结构层负责表达机制，包括 <code>C</code>、<code>I</code>、<code>P</code>、<code>A</code> 四个特征；背景控制层负责吸收非结构性变异，包括活跃度计数、局部体量、曝光熵、创作者受欢迎度、新鲜度、度不对称、标签不确定性和列表上下文。核心层与控制层同时进入诊断模型，才能回答一个关键问题：结构信号是否真的提供了超出强基线的增量信息。</p>
+<h2 id="method-5-四个核心特征分别回答什么问题">5. 四个核心特征分别回答什么问题</h2>
+<p><code>C</code> 基于局部旋度构造，衡量三元组边界上的非势流闭合强度，用来识别持续性的方向性回流。<code>I</code> 描述三元组边界上内群体边的比例，用来衡量局部暴露是否主要被群体边界封闭。<code>P</code> 用相邻时间窗口中的边权相似度衡量结构是否持续存在，用来区分瞬时扰动与跨窗口锁定。<code>A</code> 则用归一化集中度刻画曝光是否压在少数边上，用来识别单向主导和局部放大。</p>
+<h2 id="method-6-方向感知边信号为何这样定义">6. 方向感知边信号为何这样定义</h2>
+<p>论文没有把原始非负边权直接送入 Hodge 旋度，而是先构造方向感知边信号。原因很直接：原始边权只能表达体量大小，旋度需要有符号信号，才能区分方向性失衡和纯粹的规模不平衡。通过与反向边比较，符号来自互惠差异，幅度保留边权大小，旋度因此被解释为方向性结构条件，而不是单纯的强边叠加。</p>
+<h2 id="method-7-tshm-的目标定义">7. TSHM 的目标定义</h2>
+<p>TSHM 不预测一个手工拼接的大分数，而是预测三类独立定义的负面事件：结构性负面事件、分布性负面事件和复合负面事件。这些事件由集中度、跨群体多样性、提供者差距、用户质量差距和尾部饥饿等分配结果函数定义，而不是直接复用 TSFB 的公式。这样的设计把风险标签和结构特征在公式上拆开，使模型输出成为真正的事件概率。</p>
+<h2 id="method-8-公式独立与过程相关">8. 公式独立与过程相关</h2>
+<p>TSHM 与 TSFB 的关系必须表达得足够准确。它们在公式上独立，因为标签和特征属于不同函数族；它们又在过程上相关，因为标签和特征都来自同一分配过程，底层共享边权数据。论文不回避这种共享过程依赖，而是把它透明报告出来，并要求后续评估显式展示核心层与控制层的信息贡献。</p>
+<h2 id="method-9-secr-如何把结构风险接回动作空间">9. SECR 如何把结构风险接回动作空间</h2>
+<p>SECR 在列表级别联合优化三个量：效用 <code>U</code>、公平 <code>F</code> 和结构性外部性惩罚 <code>S</code>。它不是在聚合图上抽象地“修图”，而是在候选项目进入每个位置时，估计该动作会给局部三元组风险带来多少增量变化。这样一来，图级结构条件被重新操作化为可执行的列表级动作。</p>
+<h2 id="method-10-为什么强调结构保持">10. 为什么强调结构保持</h2>
+<p>SECR 的设计不是删边、重连或重写网络骨架，而是坚持四个约束：非负、源侧守恒、边级扰动有界和总预算有界。这四个约束决定了它更接近平台治理语境中的可审计调整，而不是脱离制度边界的全局最优器。它的价值在于提供一种可问责、可解释、可执行的重排序原型。</p>
+<h2 id="method-11-局部增量风险近似的作用">11. 局部增量风险近似的作用</h2>
+<p>如果每评估一个候选项目都完整重算 TSFB 与 TSHM，列表级干预几乎不可执行。因此论文采用局部一阶近似：只考虑新增边会影响到的局部三元组，只在这些三元组上更新特征扰动，再用校准风险对特征的局部梯度近似风险变化。这一步是 SECR 从理论对象进入实际动作空间的关键桥梁。</p>
+<h2 id="method-12-方法链的压缩表达">12. 方法链的压缩表达</h2>
+<p>整条方法链可以压缩成一句话：论文先把推荐系统写成重复可见性分配，再把分配诱导出的曝光图写成三元组结构条件，随后用校准风险模型识别值得审计的局部模式，最后把这些模式转化为列表级、结构保持、可审计的重排序约束。</p>
+    </article>
+  </section>
+  
+
+  <section class="doc-block" id="protocol">
+    <div class="doc-header">
+      <span class="doc-kicker">Technical Note 02</span>
+      <h2>技术解释二：理论、评估与边界</h2>
+      <p>解释命题边界、评估协议、失败判据与局限性。</p>
+    </div>
+    <article class="prose">
+      <h1 id="protocol-技术解释二-理论-评估与边界">技术解释二：理论、评估与边界</h1>
+<h2 id="protocol-1-理论部分解决什么问题">1. 理论部分解决什么问题</h2>
+<p>论文的理论部分不追求笼统的全局最优性，而是解决三个更关键的问题：三元组层是否真的包含二元分析看不见的信息，SECR 这种位置贪心在什么条件下是合理的，以及风险分数的推断边界究竟到哪里为止。理论在这里承担的是限定能力范围的作用，而不是为方法制造过度主张。</p>
+<h2 id="protocol-2-命题-1-旋度与势流可分">2. 命题 1：旋度与势流可分</h2>
+<p>命题 1 为三元组分析提供理论锚点。边信号可以分解为梯度、调和和旋度三个正交分量，旋度只在三角边界上显现。这意味着三元组层天然保留了一类二元势流方法无法恢复的局部方向性信息。该命题不是在否定二元方法，而是在说明为什么高阶层诊断是必要的补充。</p>
+<h2 id="protocol-3-命题-2-受限条件下的贪心近似">3. 命题 2：受限条件下的贪心近似</h2>
+<p>命题 2 只在明确约束下成立：效用函数可分、结构风险使用局部一阶近似、邻域截断为 <code>L = 1</code>，公平项可以写成可处理的基数约束。它的意义不在于证明 SECR 在所有设置下都最优，而在于说明在一个被清楚限定的操作区域内，位置贪心不是任意拼装出来的启发式。</p>
+<h2 id="protocol-4-命题-3-审计范围边界">4. 命题 3：审计范围边界</h2>
+<p>命题 3 是最需要主动强调的理论结果。论文处理的是分配决策、曝光图和三元组结构条件，而不是用户态度变化、长期政治行为或社会福利结果。因此，风险分数只能被解释为审计触发器，不能被包装成态度或福利结果的替身。这个边界不是附带的免责声明，而是整篇论文成立的支柱。</p>
+<h2 id="protocol-5-为什么评估要分三层证据">5. 为什么评估要分三层证据</h2>
+<p>新版手稿把评估设计成三层证据，是为了控制不同层级的推断强度。第一层是公开日志数据，回答请求级诊断、策略对比和多指标表现；第二层是机制隔离仿真，回答方法在不同生成世界中的退化方式；第三层是历史重放与方向一致性参考，用来提供更外部的边界检查，而不是充当真实部署验证。</p>
+<h2 id="protocol-6-数据集分别承担什么角色">6. 数据集分别承担什么角色</h2>
+<p>MIND 提供大规模新闻推荐日志，适合观察请求级诊断，但共印象仍然只是代理。FINN.no Slates 记录了更清晰的完整列表结构，适合讨论列表级动作空间。KuaiRand 则因为包含随机曝光子集，能为离策略评估提供更可信的锚点。数据集的价值不在于数量堆叠，而在于它们分别支持了对象层、评估层和策略层的不同需求。</p>
+<h2 id="protocol-7-诊断指标与策略指标为何必须同时报告">7. 诊断指标与策略指标为何必须同时报告</h2>
+<p>论文同时报告两类指标，是为了避免只凭内部风险分数自证。诊断指标包括 ROC AUC、PR AUC、Brier、ECE 和特征消融，它们回答风险模型本身是否可靠。策略指标包括 NDCG@K、提供者公平差距、用户公平差距、覆盖率、多样性、结构风险降幅和策略距离，它们回答把风险信号接回列表级动作之后，系统付出了什么代价，又换回了什么收益。</p>
+<h2 id="protocol-8-失败判据为什么要前置">8. 失败判据为什么要前置</h2>
+<p>论文把失败判据直接写进协议，而不是等实验结束后再解释结果。这样做既防止选择性叙述，也让读者提前知道哪些情况会直接削弱主张。关键失败判据包括：TSHM 不能显著超过 ActivityCount、去掉核心结构层后性能几乎不下降、SECR 的效用损失过大，以及任一任务的校准误差超过预设阈值。</p>
+<h2 id="protocol-9-当前必须守住的解释边界">9. 当前必须守住的解释边界</h2>
+<p>无论后续结果多完整，都必须守住三条边界。风险下降不等于态度改善；结构信号不等于真实平台的最终治理答案；历史重放和仿真结果不等于线上随机实验。只有坚持这三条边界，论文作为方法稿的证据语言才足够稳。</p>
+<h2 id="protocol-10-伦理与局限性">10. 伦理与局限性</h2>
+<p>当前版本的局限可以归纳为五点：三元组提取和局部近似存在计算成本；实证目前主要在二元群体标签上运行；曝光代理仍不是完美的 impression 日志；风险模型不是因果识别器；分析暂时使用单一滑动时间尺度。伦理层面的关键要求是，若群体标签涉及受保护类别，必须在制度监督下使用，风险分数不能脱离上下文直接公开。</p>
+<h2 id="protocol-11-论文的学术定位">11. 论文的学术定位</h2>
+<p>当前最稳的定位，是一篇对象定义清楚、机制链完整、把诊断、干预和解释边界写成闭环的方法稿。它具备 Q1 方法论文应有的完整度，但仍未声称自己已经达到真实平台顶级实证稿的证据强度。</p>
+<h2 id="protocol-12-收束表达">12. 收束表达</h2>
+<p>理论部分负责证明三元组层的必要性、限定 SECR 的合理操作区间，并把推断边界写清；评估部分负责用分层证据和失败判据约束结论语言，使结构风险审计停留在它真正能够承担的范围之内。</p>
+    </article>
+  </section>
+  
+      </main>
+      <aside class="toc-panel">
+        <h3>目录导航</h3>
+        <div class="toc-links">
+          <a class="toc-link " href="#method">技术解释一：对象、结构与方法</a>
+<a class="toc-link " href="#method-1-三层对象为什么必须分开">1. 三层对象为什么必须分开</a>
+<a class="toc-link " href="#method-2-动态曝光图如何构造">2. 动态曝光图如何构造</a>
+<a class="toc-link " href="#method-3-为什么诊断单元是三元组">3. 为什么诊断单元是三元组</a>
+<a class="toc-link " href="#method-4-tsfb-的两层结构">4. TSFB 的两层结构</a>
+<a class="toc-link " href="#method-5-四个核心特征分别回答什么问题">5. 四个核心特征分别回答什么问题</a>
+<a class="toc-link " href="#method-6-方向感知边信号为何这样定义">6. 方向感知边信号为何这样定义</a>
+<a class="toc-link " href="#method-7-tshm-的目标定义">7. TSHM 的目标定义</a>
+<a class="toc-link " href="#method-8-公式独立与过程相关">8. 公式独立与过程相关</a>
+<a class="toc-link " href="#method-9-secr-如何把结构风险接回动作空间">9. SECR 如何把结构风险接回动作空间</a>
+<a class="toc-link " href="#method-10-为什么强调结构保持">10. 为什么强调结构保持</a>
+<a class="toc-link " href="#method-11-局部增量风险近似的作用">11. 局部增量风险近似的作用</a>
+<a class="toc-link " href="#method-12-方法链的压缩表达">12. 方法链的压缩表达</a>
+<a class="toc-link " href="#protocol">技术解释二：理论、评估与边界</a>
+<a class="toc-link " href="#protocol-1-理论部分解决什么问题">1. 理论部分解决什么问题</a>
+<a class="toc-link " href="#protocol-2-命题-1-旋度与势流可分">2. 命题 1：旋度与势流可分</a>
+<a class="toc-link " href="#protocol-3-命题-2-受限条件下的贪心近似">3. 命题 2：受限条件下的贪心近似</a>
+<a class="toc-link " href="#protocol-4-命题-3-审计范围边界">4. 命题 3：审计范围边界</a>
+<a class="toc-link " href="#protocol-5-为什么评估要分三层证据">5. 为什么评估要分三层证据</a>
+<a class="toc-link " href="#protocol-6-数据集分别承担什么角色">6. 数据集分别承担什么角色</a>
+<a class="toc-link " href="#protocol-7-诊断指标与策略指标为何必须同时报告">7. 诊断指标与策略指标为何必须同时报告</a>
+<a class="toc-link " href="#protocol-8-失败判据为什么要前置">8. 失败判据为什么要前置</a>
+<a class="toc-link " href="#protocol-9-当前必须守住的解释边界">9. 当前必须守住的解释边界</a>
+<a class="toc-link " href="#protocol-10-伦理与局限性">10. 伦理与局限性</a>
+<a class="toc-link " href="#protocol-11-论文的学术定位">11. 论文的学术定位</a>
+<a class="toc-link " href="#protocol-12-收束表达">12. 收束表达</a>
+        </div>
+      </aside>
+    </section>
+
+    <div class="footer">静态构建页由 <code>build_showtime_site.py</code> 生成，可直接部署到 GitHub Pages。</div>
+  </div>
+
+  <script>
+    const key = "showtime-theme";
+    const toggle = document.getElementById("themeToggle");
+    const saved = localStorage.getItem(key);
+    if (saved === "night") document.body.dataset.theme = "night";
+    toggle.addEventListener("click", () => {
+      document.body.dataset.theme = document.body.dataset.theme === "night" ? "" : "night";
+      localStorage.setItem(key, document.body.dataset.theme === "night" ? "night" : "day");
+    });
+
+    const links = Array.from(document.querySelectorAll(".toc-link"));
+    const sections = links
+      .map((link) => document.querySelector(link.getAttribute("href")))
+      .filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.id}`);
+      });
+    }, { rootMargin: "-30% 0px -55% 0px", threshold: [0.1, 0.3, 0.6] });
+    sections.forEach((section) => observer.observe(section));
+  </script>
+</body>
+</html>
