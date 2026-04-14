@@ -308,7 +308,7 @@ def page_template(title: str, subtitle: str, lead: str, quick_links_html: str, t
     }}
 
     .page-shell {{
-      max-width: 1440px;
+      max-width: 1480px;
       margin: 0 auto;
       padding: 28px 24px 64px;
     }}
@@ -495,13 +495,16 @@ def page_template(title: str, subtitle: str, lead: str, quick_links_html: str, t
     }}
 
     .content-area {{
-      padding: 28px;
+      padding: 34px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(252, 246, 238, 0.92)),
+        radial-gradient(circle at top right, rgba(33, 79, 75, 0.05), transparent 38%);
     }}
 
     .doc-block + .doc-block {{
-      margin-top: 34px;
-      padding-top: 34px;
-      border-top: 1px solid rgba(68, 52, 36, 0.08);
+      margin-top: 42px;
+      padding-top: 42px;
+      border-top: 1px solid rgba(68, 52, 36, 0.1);
     }}
 
     .doc-header {{
@@ -535,6 +538,7 @@ def page_template(title: str, subtitle: str, lead: str, quick_links_html: str, t
 
     .doc-header p {{
       margin: 10px 0 0;
+      max-width: 64ch;
       color: var(--text-muted);
       line-height: 1.8;
     }}
@@ -596,27 +600,35 @@ def page_template(title: str, subtitle: str, lead: str, quick_links_html: str, t
     }}
 
     .prose h2 {{
-      margin: 28px 0 12px;
+      margin: 34px 0 14px;
       font-size: 28px;
       line-height: 1.18;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(68, 52, 36, 0.1);
     }}
 
     .prose h3 {{
-      margin: 22px 0 10px;
+      margin: 24px 0 10px;
       font-size: 20px;
       line-height: 1.28;
+      color: var(--accent-deep);
     }}
 
     .prose p {{
       margin: 0 0 14px;
+      max-width: 74ch;
       color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.92;
     }}
 
     .prose ul,
     .prose ol {{
       margin: 0 0 18px;
+      max-width: 72ch;
       padding-left: 1.3rem;
       color: var(--text-muted);
+      line-height: 1.85;
     }}
 
     .prose li + li {{
@@ -625,10 +637,13 @@ def page_template(title: str, subtitle: str, lead: str, quick_links_html: str, t
 
     .prose blockquote {{
       margin: 0 0 18px;
-      padding: 16px 18px;
+      max-width: 76ch;
+      padding: 18px 20px;
       border-left: 3px solid rgba(154, 89, 48, 0.32);
-      border-radius: 0 16px 16px 0;
-      background: rgba(255, 248, 239, 0.78);
+      border-radius: 0 18px 18px 0;
+      background:
+        linear-gradient(180deg, rgba(255, 248, 239, 0.84), rgba(252, 243, 233, 0.82)),
+        radial-gradient(circle at top right, rgba(154, 89, 48, 0.06), transparent 40%);
       color: var(--text);
     }}
 
@@ -664,6 +679,7 @@ def page_template(title: str, subtitle: str, lead: str, quick_links_html: str, t
       border: 1px solid rgba(33, 79, 75, 0.16);
       background: linear-gradient(180deg, rgba(240, 247, 245, 0.94), rgba(232, 241, 238, 0.88));
       color: var(--accent-alt);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
     }}
 
     .prose mjx-container {{

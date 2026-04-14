@@ -62,7 +62,7 @@
     }
 
     .page-shell {
-      max-width: 1440px;
+      max-width: 1480px;
       margin: 0 auto;
       padding: 28px 24px 64px;
     }
@@ -249,13 +249,16 @@
     }
 
     .content-area {
-      padding: 28px;
+      padding: 34px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(252, 246, 238, 0.92)),
+        radial-gradient(circle at top right, rgba(33, 79, 75, 0.05), transparent 38%);
     }
 
     .doc-block + .doc-block {
-      margin-top: 34px;
-      padding-top: 34px;
-      border-top: 1px solid rgba(68, 52, 36, 0.08);
+      margin-top: 42px;
+      padding-top: 42px;
+      border-top: 1px solid rgba(68, 52, 36, 0.1);
     }
 
     .doc-header {
@@ -289,6 +292,7 @@
 
     .doc-header p {
       margin: 10px 0 0;
+      max-width: 64ch;
       color: var(--text-muted);
       line-height: 1.8;
     }
@@ -350,27 +354,35 @@
     }
 
     .prose h2 {
-      margin: 28px 0 12px;
+      margin: 34px 0 14px;
       font-size: 28px;
       line-height: 1.18;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(68, 52, 36, 0.1);
     }
 
     .prose h3 {
-      margin: 22px 0 10px;
+      margin: 24px 0 10px;
       font-size: 20px;
       line-height: 1.28;
+      color: var(--accent-deep);
     }
 
     .prose p {
       margin: 0 0 14px;
+      max-width: 74ch;
       color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.92;
     }
 
     .prose ul,
     .prose ol {
       margin: 0 0 18px;
+      max-width: 72ch;
       padding-left: 1.3rem;
       color: var(--text-muted);
+      line-height: 1.85;
     }
 
     .prose li + li {
@@ -379,10 +391,13 @@
 
     .prose blockquote {
       margin: 0 0 18px;
-      padding: 16px 18px;
+      max-width: 76ch;
+      padding: 18px 20px;
       border-left: 3px solid rgba(154, 89, 48, 0.32);
-      border-radius: 0 16px 16px 0;
-      background: rgba(255, 248, 239, 0.78);
+      border-radius: 0 18px 18px 0;
+      background:
+        linear-gradient(180deg, rgba(255, 248, 239, 0.84), rgba(252, 243, 233, 0.82)),
+        radial-gradient(circle at top right, rgba(154, 89, 48, 0.06), transparent 40%);
       color: var(--text);
     }
 
@@ -418,6 +433,7 @@
       border: 1px solid rgba(33, 79, 75, 0.16);
       background: linear-gradient(180deg, rgba(240, 247, 245, 0.94), rgba(232, 241, 238, 0.88));
       color: var(--accent-alt);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
     .prose mjx-container {
@@ -549,37 +565,82 @@
     <article class="prose">
       <h1 id="method-技术解释一-对象-结构与方法">技术解释一：对象、结构与方法</h1>
 <h2 id="method-1-三层对象为什么必须分开">1. 三层对象为什么必须分开</h2>
-<p>这篇论文最重要的结构安排，是把行动对象、审计对象和诊断对象彻底拆开。行动对象是请求、候选集和推荐列表；审计对象是时间窗口内累积形成的动态曝光图；诊断对象是曝光图上的三元组结构条件。这样的拆分避免了最常见的对象混淆。平台真正控制的是列表级分配，而不是用户态度；审计者真正能观察的是分配诱导出的结构，而不是心理结果本身。</p>
-<h2 id="method-2-动态曝光图如何构造">2. 动态曝光图如何构造</h2>
-<p>动态曝光图来自列表级日志，而不是来自社交关系。对每次请求，系统从候选集中给出前 <code>K</code> 个项目；每个位置贡献一个位置折扣后的曝光量 <code>e_(r,k)</code>；在固定时间窗口内，把用户 <code>i</code> 对创作者 <code>j</code> 的累计曝光聚合成有向边权 <code>f_t(i,j)</code>。因此，曝光图的每条边都表示可见性分配的历史累积，而不是社交连接或互动结果。</p>
-<div class="math-block">\[e_{r,k}=\gamma^{k-1}q(a_{r,k},u_r), \qquad
-f_t(i,j)=\sum_{\tau=t-w}^{t}\sum_{r\in\mathcal{R}_{\tau}:u_r=i}\sum_{k:c(a_{r,k})=j} e_{r,k}\]</div>
-<h2 id="method-3-为什么诊断单元是三元组">3. 为什么诊断单元是三元组</h2>
-<p>二元分析只能处理成对不平衡，难以稳定描述局部方向性闭环。三元组则同时容纳共同暴露、方向性不对称和局部回流，是当前框架中最小的高阶可计算单元。Hodge 分解中的局部旋度只会在三角边界上显现，这就是三元组的理论意义，也是论文坚持从三元组而不是从边级定义结构条件的原因。</p>
-<h2 id="method-4-tsfb-的两层结构">4. TSFB 的两层结构</h2>
-<p>TSFB 由核心结构层和背景控制层组成。核心结构层负责表达机制，包括 <code>C</code>、<code>I</code>、<code>P</code>、<code>A</code> 四个特征；背景控制层负责吸收非结构性变异，包括活跃度计数、局部体量、曝光熵、创作者受欢迎度、新鲜度、度不对称、标签不确定性和列表上下文。核心层与控制层同时进入诊断模型，才能回答一个关键问题：结构信号是否真的提供了超出强基线的增量信息。</p>
-<h2 id="method-5-四个核心特征分别回答什么问题">5. 四个核心特征分别回答什么问题</h2>
-<p><code>C</code> 基于局部旋度构造，衡量三元组边界上的非势流闭合强度，用来识别持续性的方向性回流。<code>I</code> 描述三元组边界上内群体边的比例，用来衡量局部暴露是否主要被群体边界封闭。<code>P</code> 用相邻时间窗口中的边权相似度衡量结构是否持续存在，用来区分瞬时扰动与跨窗口锁定。<code>A</code> 则用归一化集中度刻画曝光是否压在少数边上，用来识别单向主导和局部放大。</p>
-<div class="math-block">\[C_{\sigma,t}=\frac{\lvert \kappa_{\sigma}^{(q)}(t)\rvert}{\sum_{e\in\partial\sigma}\lvert f_t^{(q)}(e)\rvert+\varepsilon},\quad
-I_{\sigma,t}=1-\frac{\lvert \partial\sigma \cap E_{\mathrm{cross}}\rvert}{\lvert \partial\sigma \rvert}\]</div>
-<div class="math-block">\[P_{\sigma,t}=\mathrm{mean}_{e\in\partial\sigma}\cos\!\big(f_t(e),f_{t-1}(e)\big),\quad
-A_{\sigma,t}=\mathrm{HHI}_{\mathrm{norm}}\!\left(\{f_t(e)\}_{e\in\partial\sigma}\right)\]</div>
-<h2 id="method-6-方向感知边信号为何这样定义">6. 方向感知边信号为何这样定义</h2>
-<p>论文没有把原始非负边权直接送入 Hodge 旋度，而是先构造方向感知边信号。原因很直接：原始边权只能表达体量大小，旋度需要有符号信号，才能区分方向性失衡和纯粹的规模不平衡。通过与反向边比较，符号来自互惠差异，幅度保留边权大小，旋度因此被解释为方向性结构条件，而不是单纯的强边叠加。</p>
-<h2 id="method-7-tshm-的目标定义">7. TSHM 的目标定义</h2>
-<p>TSHM 不预测一个手工拼接的大分数，而是预测三类独立定义的负面事件：结构性负面事件、分布性负面事件和复合负面事件。这些事件由集中度、跨群体多样性、提供者差距、用户质量差距和尾部饥饿等分配结果函数定义，而不是直接复用 TSFB 的公式。这样的设计把风险标签和结构特征在公式上拆开，使模型输出成为真正的事件概率。</p>
-<div class="math-block">\[\hat{p}_{\sigma,t}^{\mathrm{agg}}=1-\prod_{m=1}^{3}\left(1-\hat{p}_{\sigma,t}^{(m)}\right)\]</div>
-<h2 id="method-8-公式独立与过程相关">8. 公式独立与过程相关</h2>
-<p>TSHM 与 TSFB 的关系必须表达得足够准确。它们在公式上独立，因为标签和特征属于不同函数族；它们又在过程上相关，因为标签和特征都来自同一分配过程，底层共享边权数据。论文不回避这种共享过程依赖，而是把它透明报告出来，并要求后续评估显式展示核心层与控制层的信息贡献。</p>
+<p>论文最根本的结构安排，是把行动对象、审计对象和诊断对象彻底拆开。行动对象是请求、候选集和推荐列表；审计对象是时间窗口内累积形成的动态曝光图；诊断对象是曝光图上的三元组结构条件。只有这样，平台能控制什么、审计者能观察什么、模型能推断什么，才不会混在一起。</p>
+<blockquote>如果对象层不拆开，后面所有“风险”“治理”“干预”都会变成概念混用。</blockquote>
+<h2 id="method-2-动态曝光图是怎样从列表日志里长出来的">2. 动态曝光图是怎样从列表日志里长出来的</h2>
+<p>对每次请求，系统从候选集中给出前 \(K\) 个项目；每个位置贡献一个位置折扣后的曝光量：</p>
+<div class="math-block">\[e_{r,k}=\gamma^{k-1}q(a_{r,k},u_r)\]</div>
+<p>固定时间窗口后，用户 \(i\) 对创作者 \(j\) 的累计曝光被聚合成有向边权：</p>
+<div class="math-block">\[f_t(i,j)=\sum_{\tau=t-w}^{t}\sum_{r\in\mathcal R_\tau:u_r=i}\sum_{k:c(a_{r,k})=j} e_{r,k}\]</div>
+<p>于是得到审计对象：</p>
+<div class="math-block">\[G_t=(\mathcal U,E_t,f_t)\]</div>
+<p>这里最关键的不是公式形式，而是对象含义。\(G_t\) 不是社交关系图，也不是互动图；它是“平台重复把谁的内容展示给谁”之后留下的结构痕迹。</p>
+<h2 id="method-3-为什么诊断单元必须是三元组">3. 为什么诊断单元必须是三元组</h2>
+<p>边级分析最多能表达成对不平衡，很难稳定描述局部方向性闭环。三元组则能同时容纳共同暴露、方向性不对称和局部回流，是当前框架中最小的高阶可计算单元。</p>
+<p>Hodge 分解告诉我们：</p>
+<div class="math-block">\[f=B_1\phi+h+B_2^\top\psi\]</div>
+<p>三元组局部旋度由</p>
+<div class="math-block">\[\kappa_\sigma=(B_2f)_\sigma\]</div>
+<p>给出。因为旋度项与梯度势流正交，三元组层天然保留了一类二元分析无法恢复的信息。这就是论文坚持把三元组作为诊断对象的理论原因。</p>
+<h2 id="method-4-为什么还要再定义方向感知边信号">4. 为什么还要再定义方向感知边信号</h2>
+<p>原始边权 \(f_t(e)\) 是非负的，它只能表达体量，不能表达方向性失衡。为了让 Hodge 旋度真正读到“互惠差异”，论文定义：</p>
+<div class="math-block">\[f_t^{(q)}(e)=|f_t(e)|^q\cdot \mathrm{sgn}\!\big(f_t(e)-f_t(\bar e)\big)\]</div>
+<p>这个定义有三层作用：</p>
+<ol><li>幅度 \( |f_t(e)|^q \) 保留边的体量信息。</li><li>符号 \(\mathrm{sgn}(f_t(e)-f_t(\bar e))\) 编码互惠差异。</li><li>参数 \(q\) 决定高权重边的不对称性要被放大还是压缩。</li></ol>
+<p>因此，后面 TSFB 中的旋度特征不再只是“强边很多”，而是“沿着三角边界存在方向性失衡”。</p>
+<h2 id="method-5-tsfb-的四个核心特征究竟各自负责什么">5. TSFB 的四个核心特征究竟各自负责什么</h2>
+<h3 id="method-5-1-方向性循环">5.1 方向性循环</h3>
+<div class="math-block">\[\mathcal C_\sigma(t)=\frac{\lvert \kappa_\sigma^{(q)}(t)\rvert}{\sum_{e\in\partial\sigma}\lvert f_t^{(q)}(e)\rvert+\epsilon}\]</div>
+<p>它测的是局部非势流闭合，回答“曝光是否沿着三角边界持续回流”。这是四个特征里唯一必须依赖 Hodge 旋度的一个。</p>
+<h3 id="method-5-2-跨群体隔离">5.2 跨群体隔离</h3>
+<div class="math-block">\[\mathcal I_\sigma(t)=1-\frac{\lvert\{e\in\partial\sigma:g(\mathrm{src}(e))\neq g(\mathrm{tgt}(e))\}\rvert}{\lvert\partial\sigma\rvert}\]</div>
+<p>它看的是边界上的边是否主要落在群体内部。值越高，局部跨群体接触越少。</p>
+<h3 id="method-5-3-时间持续性">5.3 时间持续性</h3>
+<div class="math-block">\[\mathcal P_\sigma(t)=\frac{1}{\lvert\partial\sigma\rvert}\sum_{e\in\partial\sigma}\cos\!\big(\mathbf f_t(e),\mathbf f_{t-1}(e)\big)\]</div>
+<p>它区分瞬时扰动和结构锁定。若 \(\mathcal P\) 高，说明局部结构在相邻窗口里反复出现。</p>
+<h3 id="method-5-4-放大集中">5.4 放大集中</h3>
+<div class="math-block">\[\mathcal A_\sigma(t)=\mathrm{HHI}_{\mathrm{norm}}\!\Big(\{f_t^{(q)}(e)\}_{e\in\partial\sigma}\Big)\]</div>
+<p>它回答的是：曝光是否已经被压在少数边上，形成局部单向主导。</p>
+<h2 id="method-6-背景控制层为什么不是附属品">6. 背景控制层为什么不是附属品</h2>
+<p>TSFB 不是只保留四个核心特征。它还必须把活跃度计数、局部边体量、曝光熵、创作者受欢迎度、新鲜度、度不对称、标签不确定性和列表上下文一起纳入。</p>
+<p>原因很直接：如果不把这些强基线放进同一个诊断框架，核心结构特征看起来很强，可能只是因为它们顺便编码了体量或活跃度。背景控制层的作用，就是把这些“容易赢”的解释先吸收掉，让结构特征在更严苛的条件下证明自己。</p>
+<h2 id="method-7-tshm-为什么不能做成一个总分模型">7. TSHM 为什么不能做成一个总分模型</h2>
+<p>TSHM 的定位是审计触发模型。它不输出一个“大而全的坏分数”，而是输出三类不同的负面事件概率。</p>
+<p>结构性负面事件：</p>
+<div class="math-block">\[Y_{\sigma,t+1}^{\mathrm{struct}}=\mathbf1\!\left[\mathrm{ExposureGini}(\sigma,t+1)-\mathrm{ExposureGini}(\sigma,t)&gt;\delta_1\;\mathrm{or}\;\mathrm{CrossGroupDiv}(\sigma,t+1)&lt;\tau_2\right]\]</div>
+<p>分布性负面事件：</p>
+<div class="math-block">\[Y_{\sigma,t+1}^{\mathrm{alloc}}=\mathbf1\!\left[\Delta\mathrm{ProviderGap}&gt;\delta_3\;\mathrm{or}\;\Delta\mathrm{UserQualityDisparity}&gt;\delta_4\;\mathrm{or}\;\mathrm{TailStarvation}&gt;\delta_5\right]\]</div>
+<p>复合性负面事件：</p>
+<div class="math-block">\[Y_{\sigma,t+1}^{\mathrm{comp}}=Y_{\sigma,t+1}^{\mathrm{struct}}Y_{\sigma,t+1}^{\mathrm{alloc}}\]</div>
+<p>多任务输出写成：</p>
+<div class="math-block">\[\hat{\mathbf p}_{\sigma,t}=\big(\hat p_{\sigma,t}^{(1)},\hat p_{\sigma,t}^{(2)},\hat p_{\sigma,t}^{(3)}\big)\]</div>
+<p>默认聚合风险为：</p>
+<div class="math-block">\[\hat p_{\sigma,t}^{\mathrm{agg}}=1-\prod_{m=1}^{3}\big(1-\hat p_{\sigma,t}^{(m)}\big)\]</div>
+<p>这样做的关键价值，是把“结构恶化”“分配恶化”和“复合高风险”拆开报告。平台到底想监控哪一类风险，可以在后续动作层再决定。</p>
+<h2 id="method-8-公式独立与过程相关必须同时讲清">8. 公式独立与过程相关必须同时讲清</h2>
+<p>TSHM 与 TSFB 的关系有两个维度：</p>
+<ol><li><strong>公式上独立。</strong> 标签由 ExposureGini、CrossGroupDiv、ProviderGap 等结果函数定义，形式上不同于 TSFB 的旋度比、标签比例、余弦相似度和 HHI。</li><li><strong>过程上相关。</strong> 标签和特征都来自同一个分配过程诱导出的边权数据，因此共享过程依赖无法被完全消除。</li></ol>
+<p>这就是为什么论文不能把 TSHM 描述成“完全独立的风险识别器”。更诚实的说法是：它是公式独立的多任务校准诊断模型，但必须透明报告共享过程依赖。</p>
 <h2 id="method-9-secr-如何把结构风险接回动作空间">9. SECR 如何把结构风险接回动作空间</h2>
-<p>SECR 在列表级别联合优化三个量：效用 <code>U</code>、公平 <code>F</code> 和结构性外部性惩罚 <code>S</code>。它不是在聚合图上抽象地“修图”，而是在候选项目进入每个位置时，估计该动作会给局部三元组风险带来多少增量变化。这样一来，图级结构条件被重新操作化为可执行的列表级动作。</p>
-<h2 id="method-10-为什么强调结构保持">10. 为什么强调结构保持</h2>
-<p>SECR 的设计不是删边、重连或重写网络骨架，而是坚持四个约束：非负、源侧守恒、边级扰动有界和总预算有界。这四个约束决定了它更接近平台治理语境中的可审计调整，而不是脱离制度边界的全局最优器。它的价值在于提供一种可问责、可解释、可执行的重排序原型。</p>
-<h2 id="method-11-局部增量风险近似的作用">11. 局部增量风险近似的作用</h2>
-<p>如果每评估一个候选项目都完整重算 TSFB 与 TSHM，列表级干预几乎不可执行。因此论文采用局部一阶近似：只考虑新增边会影响到的局部三元组，只在这些三元组上更新特征扰动，再用校准风险对特征的局部梯度近似风险变化。这一步是 SECR 从理论对象进入实际动作空间的关键桥梁。</p>
-<div class="math-block">\[\Delta S(\pi_r)\approx \sum_{\sigma\in\mathcal{N}_L(u,v)} \nabla_{\mathbf z}\hat p_{\sigma,t}^{\mathrm{agg}}\cdot \Delta \mathbf z_{\sigma,t}\]</div>
-<h2 id="method-12-方法链的压缩表达">12. 方法链的压缩表达</h2>
-<p>整条方法链可以压缩成一句话：论文先把推荐系统写成重复可见性分配，再把分配诱导出的曝光图写成三元组结构条件，随后用校准风险模型识别值得审计的局部模式，最后把这些模式转化为列表级、结构保持、可审计的重排序约束。</p>
+<p>SECR 在列表级别联合优化效用、公平和结构性外部性：</p>
+<div class="math-block">\[\mathbf a_r^\star=\arg\max_{\mathbf a_r\in\Pi_K(C_r)}\Big[\lambda_u U(\mathbf a_r,u_r)+\lambda_fF(\mathbf a_r)-\lambda_sS(\mathbf a_r,G_t)\Big]\]</div>
+<p>效用项：</p>
+<div class="math-block">\[U(\mathbf a_r,u_r)=\sum_{k=1}^{K}\gamma^{k-1}\hat u(a_{r,k},u_r)\]</div>
+<p>提供者公平项：</p>
+<div class="math-block">\[F_{\mathrm{provider}}(\mathbf a_r)=-\left|\frac{1}{K}\sum_{k=1}^{K}\mathbf1[c(a_{r,k})\in\mathcal G_{\mathrm{under}}]-\pi_{\mathrm{target}}\right|\]</div>
+<p>结构项：</p>
+<div class="math-block">\[S(\mathbf a_r,G_t)=\sum_{k=1}^{K}\gamma^{k-1}\widehat{\Delta S}(a_{r,k},k\mid r,G_t)\]</div>
+<p>这里最重要的不是目标函数的表面形式，而是三项分别对应不同对象：效用项保证排序质量，公平项约束创作者覆盖，结构项把图级风险真正送回当前请求的动作选择。</p>
+<h2 id="method-10-为什么必须使用局部增量风险近似">10. 为什么必须使用局部增量风险近似</h2>
+<p>如果每评估一个候选就完整重算一遍 TSFB 和 TSHM，SECR 几乎无法执行。因此论文使用：</p>
+<div class="math-block">\[\Delta\hat p_{\sigma,t}^{\mathrm{agg}}(v,k)\approx \nabla_{\mathbf z}\hat p^{\mathrm{agg}}\Big|_{\mathbf z=\mathbf z_{\sigma,t}}\cdot \Delta\mathbf z_\sigma(v,k)\]</div>
+<p>这一步意味着：</p>
+<ol><li>只在新增边会影响到的局部三元组上更新特征。</li><li>用风险模型的局部梯度去近似风险变化。</li><li>用工程可行性换取全图精确性。</li></ol>
+<p>因此，SECR 更准确的定位是“可审计干预原型”，而不是“福利最优器”。</p>
+<h2 id="method-11-这条方法链真正完成了什么桥接">11. 这条方法链真正完成了什么桥接</h2>
+<p>整条方法链可以压缩成一句话：</p>
+<ol><li>先把推荐系统写成重复可见性分配。</li><li>再把这些分配累积成动态曝光图。</li><li>然后在三元组层抽出结构条件。</li><li>再把结构条件映射成校准风险。</li><li>最后把风险重新送回列表级动作。</li></ol>
+<p>它完成的不是“从数据到预测”的普通模型链，而是“从分配动作到结构审计，再回到分配动作”的闭环。这就是这篇方法稿最独特的地方。</p>
     </article>
   </section>
   
@@ -592,34 +653,63 @@ A_{\sigma,t}=\mathrm{HHI}_{\mathrm{norm}}\!\left(\{f_t(e)\}_{e\in\partial\sigma}
     </div>
     <article class="prose">
       <h1 id="protocol-技术解释二-理论-评估与边界">技术解释二：理论、评估与边界</h1>
-<h2 id="protocol-1-理论部分解决什么问题">1. 理论部分解决什么问题</h2>
-<p>论文的理论部分不追求笼统的全局最优性，而是解决三个更关键的问题：三元组层是否真的包含二元分析看不见的信息，SECR 这种位置贪心在什么条件下是合理的，以及风险分数的推断边界究竟到哪里为止。理论在这里承担的是限定能力范围的作用，而不是为方法制造过度主张。</p>
+<h2 id="protocol-1-理论部分在这篇论文里承担什么角色">1. 理论部分在这篇论文里承担什么角色</h2>
+<p>这篇论文的理论部分不是为了证明一个过分宽泛的“全局最优性”，而是为了守住三道边界：</p>
+<ol><li>三元组层到底有没有二元分析看不见的信息增量。</li><li>SECR 这种位置贪心在什么条件下是合理的。</li><li>风险分数到底能被解释到哪里为止。</li></ol>
+<p>理论在这里的任务，是把论文的主张限定在证据真正覆盖的范围内。</p>
 <h2 id="protocol-2-命题-1-旋度与势流可分">2. 命题 1：旋度与势流可分</h2>
-<p>命题 1 为三元组分析提供理论锚点。边信号可以分解为梯度、调和和旋度三个正交分量，旋度只在三角边界上显现。这意味着三元组层天然保留了一类二元势流方法无法恢复的局部方向性信息。该命题不是在否定二元方法，而是在说明为什么高阶层诊断是必要的补充。</p>
-<div class="math-block">\[f_t^{(q)}=\nabla \phi_t + h_t + B_{2,t}^{\top}\omega_t, \qquad
-\kappa_{\sigma}^{(q)}(t)=\left(B_{2,t}f_t^{(q)}\right)_{\sigma}\]</div>
+<p>命题 1 的正式表达来自 Hodge 分解：</p>
+<div class="math-block">\[f=B_1\phi+h+B_2^\top\psi\]</div>
+<p>三元组局部旋度由</p>
+<div class="math-block">\[\kappa_\sigma=(B_2f)_\sigma\]</div>
+<p>给出，并且与梯度势流子空间正交。</p>
+<p>这个命题真正买来的东西是：三元组层确实包含一类二元势流分析不可恢复的局部方向性信息。也就是说，论文中的 \(\mathcal C\) 不是把传统边级不平衡换个说法重复一遍，而是在读取一个新增的信息分量。</p>
+<blockquote>需要强调：这只是说明“存在一个信息盲区”，不是说所有重要结构都必须依赖三元组，更不是说二元方法整体失效。</blockquote>
 <h2 id="protocol-3-命题-2-受限条件下的贪心近似">3. 命题 2：受限条件下的贪心近似</h2>
-<p>命题 2 只在明确约束下成立：效用函数可分、结构风险使用局部一阶近似、邻域截断为 <code>L = 1</code>，公平项可以写成可处理的基数约束。它的意义不在于证明 SECR 在所有设置下都最优，而在于说明在一个被清楚限定的操作区域内，位置贪心不是任意拼装出来的启发式。</p>
-<div class="math-block">\[\pi_r^\star=\arg\max_{\pi_r}\;\lambda_u U(\pi_r)-\lambda_f F(\pi_r)-\lambda_s S(\pi_r)\]</div>
+<p>SECR 的位置贪心并不是在任何条件下都得到理论背书。论文只在严格受限条件下给出如下界：</p>
+<div class="math-block">\[U(\mathbf a_r^{\mathrm{greedy}})\geq (1-1/e)\cdot U(\mathbf a_r^\star)\]</div>
+<p>这个结果依赖四类前提：</p>
+<ol><li>效用函数是位置折扣的可分和。</li><li>结构项使用局部一阶近似，而不是精确全图重算。</li><li>邻域截断默认 \(L=1\)。</li><li>公平项可以写成可处理的基数约束。</li></ol>
+<p>这意味着命题 2 的价值，在于告诉读者“存在一个清晰可操作的工程区间”，而不是“SECR 在一般情形下已经近似最优”。</p>
 <h2 id="protocol-4-命题-3-审计范围边界">4. 命题 3：审计范围边界</h2>
-<p>命题 3 是最需要主动强调的理论结果。论文处理的是分配决策、曝光图和三元组结构条件，而不是用户态度变化、长期政治行为或社会福利结果。因此，风险分数只能被解释为审计触发器，不能被包装成态度或福利结果的替身。这个边界不是附带的免责声明，而是整篇论文成立的支柱。</p>
-<h2 id="protocol-5-为什么评估要分三层证据">5. 为什么评估要分三层证据</h2>
-<p>新版手稿把评估设计成三层证据，是为了控制不同层级的推断强度。第一层是公开日志数据，回答请求级诊断、策略对比和多指标表现；第二层是机制隔离仿真，回答方法在不同生成世界中的退化方式；第三层是历史重放与方向一致性参考，用来提供更外部的边界检查，而不是充当真实部署验证。</p>
-<h2 id="protocol-6-数据集分别承担什么角色">6. 数据集分别承担什么角色</h2>
-<p>MIND 提供大规模新闻推荐日志，适合观察请求级诊断，但共印象仍然只是代理。FINN.no Slates 记录了更清晰的完整列表结构，适合讨论列表级动作空间。KuaiRand 则因为包含随机曝光子集，能为离策略评估提供更可信的锚点。数据集的价值不在于数量堆叠，而在于它们分别支持了对象层、评估层和策略层的不同需求。</p>
-<h2 id="protocol-7-诊断指标与策略指标为何必须同时报告">7. 诊断指标与策略指标为何必须同时报告</h2>
-<p>论文同时报告两类指标，是为了避免只凭内部风险分数自证。诊断指标包括 ROC AUC、PR AUC、Brier、ECE 和特征消融，它们回答风险模型本身是否可靠。策略指标包括 NDCG@K、提供者公平差距、用户公平差距、覆盖率、多样性、结构风险降幅和策略距离，它们回答把风险信号接回列表级动作之后，系统付出了什么代价，又换回了什么收益。</p>
+<p>命题 3 给出整篇论文最重要的因果边界：</p>
+<div class="math-block">\[\text{分配决策}\to G_t\to \text{三元组结构条件}\to [\text{中介过程}]\to \text{态度/行为结果}\]</div>
+<p>TSFB 和 TSHM 只覆盖“曝光图 \(\to\) 三元组结构条件”这一段。因此，它们输出的是结构风险触发器，而不是态度预测器、福利估计量或因果效应估计器。</p>
+<p>这个命题不是一个附带免责声明，而是整篇论文可信度的支柱。只要没有额外因果设计，任何“风险下降意味着现实平台更健康”的写法都属于越界叙述。</p>
+<h2 id="protocol-5-为什么要显式讨论标签噪声">5. 为什么要显式讨论标签噪声</h2>
+<p>论文里的跨群体隔离特征 \(\mathcal I\) 依赖群体标签，因此标签噪声不能被当作细节略过。附录给出的关键结论是，在独立对称噪声率 \(\eta\) 下，\(\mathcal I\) 的有效信号会近似按下面的因子衰减：</p>
+<div class="math-block">\[\mathcal I_{\mathrm{obs}}\approx (1-2\eta)^2\mathcal I_{\mathrm{true}}\]</div>
+<p>它的含义很直接：标签越不稳定，隔离特征越会被压平。与此同时，\(\mathcal C\)、\(\mathcal P\)、\(\mathcal A\) 主要在边权空间里工作，对标签噪声更稳。这也是为什么框架不能只靠 \(\mathcal I\) 来支撑主张。</p>
+<h2 id="protocol-6-评估为什么必须分成三层证据">6. 评估为什么必须分成三层证据</h2>
+<p>论文把评估协议写成三层证据，不是为了显得完整，而是为了控制不同层级的推断强度。</p>
+<ol><li><strong>公开日志层</strong>：回答请求级诊断和策略对比。</li><li><strong>机制隔离仿真层</strong>：回答方法在不同生成世界下如何退化。</li><li><strong>历史重放层</strong>：回答方向一致性和边界检查。</li></ol>
+<p>这三层之间不能互相替代。仿真不能替代现实日志，历史重放也不能替代线上实验。</p>
+<h2 id="protocol-7-为什么同时报告区分度-校准和策略代价">7. 为什么同时报告区分度、校准和策略代价</h2>
+<p>如果只报 ROC AUC 或 PR AUC，读者只能知道模型能不能区分正负例，却不知道概率输出能否进入治理环节。论文因此要求同时报告 ECE 和 Brier。</p>
+<p>ECE：</p>
 <div class="math-block">\[\mathrm{ECE}=\sum_{b=1}^{B}\frac{|B_b|}{n}\left|\mathrm{acc}(B_b)-\mathrm{conf}(B_b)\right|\]</div>
-<h2 id="protocol-8-失败判据为什么要前置">8. 失败判据为什么要前置</h2>
-<p>论文把失败判据直接写进协议，而不是等实验结束后再解释结果。这样做既防止选择性叙述，也让读者提前知道哪些情况会直接削弱主张。关键失败判据包括：TSHM 不能显著超过 ActivityCount、去掉核心结构层后性能几乎不下降、SECR 的效用损失过大，以及任一任务的校准误差超过预设阈值。</p>
-<h2 id="protocol-9-当前必须守住的解释边界">9. 当前必须守住的解释边界</h2>
-<p>无论后续结果多完整，都必须守住三条边界。风险下降不等于态度改善；结构信号不等于真实平台的最终治理答案；历史重放和仿真结果不等于线上随机实验。只有坚持这三条边界，论文作为方法稿的证据语言才足够稳。</p>
-<h2 id="protocol-10-伦理与局限性">10. 伦理与局限性</h2>
-<p>当前版本的局限可以归纳为五点：三元组提取和局部近似存在计算成本；实证目前主要在二元群体标签上运行；曝光代理仍不是完美的 impression 日志；风险模型不是因果识别器；分析暂时使用单一滑动时间尺度。伦理层面的关键要求是，若群体标签涉及受保护类别，必须在制度监督下使用，风险分数不能脱离上下文直接公开。</p>
-<h2 id="protocol-11-论文的学术定位">11. 论文的学术定位</h2>
-<p>当前最稳的定位，是一篇对象定义清楚、机制链完整、把诊断、干预和解释边界写成闭环的方法稿。它具备 Q1 方法论文应有的完整度，但仍未声称自己已经达到真实平台顶级实证稿的证据强度。</p>
-<h2 id="protocol-12-收束表达">12. 收束表达</h2>
-<p>理论部分负责证明三元组层的必要性、限定 SECR 的合理操作区间，并把推断边界写清；评估部分负责用分层证据和失败判据约束结论语言，使结构风险审计停留在它真正能够承担的范围之内。</p>
+<p>Brier：</p>
+<div class="math-block">\[\mathrm{Brier}^{(m)}=\frac{1}{n}\sum_{i=1}^{n}\big(\hat p_i^{(m)}-y_i^{(m)}\big)^2\]</div>
+<p>这两条式子的地位并不低于 AUC。AUC 说明能不能区分，ECE 和 Brier 说明风险输出能不能被认真使用。</p>
+<h2 id="protocol-8-为什么策略距离必须和-ndcg-一起报告">8. 为什么策略距离必须和 NDCG 一起报告</h2>
+<p>如果只说“SECR 把结构风险降下来了”，读者仍然不知道它付出了多大排序改动代价。因此，论文要求同时报告策略距离：</p>
+<div class="math-block">\[d_{\mathrm{strategy}}(\mathbf a_r^{\mathrm{SECR}},\mathbf a_r^{\mathrm{base}})=1-\tau_K(\mathbf a_r^{\mathrm{SECR}},\mathbf a_r^{\mathrm{base}})\]</div>
+<p>它衡量的是：SECR 离原有策略到底走了多远。 只有当 NDCG、结构风险降幅和策略距离一起出现时，论文才能真正讲清“收益”和“代价”。</p>
+<h2 id="protocol-9-为什么要把跨群体曝光质量单独拉出来">9. 为什么要把跨群体曝光质量单独拉出来</h2>
+<p>平均效用很容易掩盖组间不平衡，因此论文额外保留了跨群体曝光质量指标：</p>
+<div class="math-block">\[\mathrm{CGEQ}(g_1,g_2,t)=\frac{1}{|\{e:g(\mathrm{src}(e))=g_1,g(\mathrm{tgt}(e))=g_2\}|}\sum_{e:g(\mathrm{src})=g_1,g(\mathrm{tgt})=g_2} q_t(e)\]</div>
+<p>它的意义不是替代整体效用，而是让“哪些群体正在持续接收更低质量内容”变成一个可以被单独追踪的现象。</p>
+<h2 id="protocol-10-失败判据为什么必须提前公布">10. 失败判据为什么必须提前公布</h2>
+<p>论文把失败判据写进协议，目的就是防止事后解释。关键失败点包括：</p>
+<ol><li>TSHM 不能显著超过 ActivityCount。</li><li>去掉核心特征后性能几乎不变。</li><li>SECR 的 NDCG 损失超过 15%。</li><li>校准后任一任务 ECE 仍高于 0.10。</li><li>在纯二元潜在空间仿真中，TSHM 却显著优于 DyadicOnly，暗示框架在“虚构高阶优势”。</li></ol>
+<p>这几条标准的共同作用，是逼迫作者在结果不理想时收缩主张，而不是用更漂亮的叙述把问题遮过去。</p>
+<h2 id="protocol-11-当前必须守住的解释边界">11. 当前必须守住的解释边界</h2>
+<p>无论结果最后多漂亮，都必须守住三条边界：</p>
+<ol><li>结构风险下降不等于态度改善。</li><li>风险分数不等于现实平台的最终治理答案。</li><li>历史重放和仿真结果不等于线上随机实验。</li></ol>
+<p>这些边界并不会削弱论文，反而是在保护论文不滑向过度推断。</p>
+<h2 id="protocol-12-这篇论文最稳的学术定位">12. 这篇论文最稳的学术定位</h2>
+<p>它最稳的定位，是一篇对象定义清楚、方法链完整、理论边界明确、实验协议执行就绪的方法稿。 它已经具备高质量方法论文应有的闭环结构，但并没有声称自己已经达到强因果平台实证稿的证据强度。</p>
+<blockquote>最后的收束表达应该是：这篇论文证明的不是“平台治理已经被解决”，而是“推荐曝光结构外部性”已经被写成一个可定义、可诊断、可约束、可失败的研究对象。</blockquote>
     </article>
   </section>
   
@@ -629,30 +719,33 @@ A_{\sigma,t}=\mathrm{HHI}_{\mathrm{norm}}\!\left(\{f_t(e)\}_{e\in\partial\sigma}
         <div class="toc-links">
           <a class="toc-link " href="#method">技术解释一：对象、结构与方法</a>
 <a class="toc-link " href="#method-1-三层对象为什么必须分开">1. 三层对象为什么必须分开</a>
-<a class="toc-link " href="#method-2-动态曝光图如何构造">2. 动态曝光图如何构造</a>
-<a class="toc-link " href="#method-3-为什么诊断单元是三元组">3. 为什么诊断单元是三元组</a>
-<a class="toc-link " href="#method-4-tsfb-的两层结构">4. TSFB 的两层结构</a>
-<a class="toc-link " href="#method-5-四个核心特征分别回答什么问题">5. 四个核心特征分别回答什么问题</a>
-<a class="toc-link " href="#method-6-方向感知边信号为何这样定义">6. 方向感知边信号为何这样定义</a>
-<a class="toc-link " href="#method-7-tshm-的目标定义">7. TSHM 的目标定义</a>
-<a class="toc-link " href="#method-8-公式独立与过程相关">8. 公式独立与过程相关</a>
+<a class="toc-link " href="#method-2-动态曝光图是怎样从列表日志里长出来的">2. 动态曝光图是怎样从列表日志里长出来的</a>
+<a class="toc-link " href="#method-3-为什么诊断单元必须是三元组">3. 为什么诊断单元必须是三元组</a>
+<a class="toc-link " href="#method-4-为什么还要再定义方向感知边信号">4. 为什么还要再定义方向感知边信号</a>
+<a class="toc-link " href="#method-5-tsfb-的四个核心特征究竟各自负责什么">5. TSFB 的四个核心特征究竟各自负责什么</a>
+<a class="toc-link toc-sub" href="#method-5-1-方向性循环">5.1 方向性循环</a>
+<a class="toc-link toc-sub" href="#method-5-2-跨群体隔离">5.2 跨群体隔离</a>
+<a class="toc-link toc-sub" href="#method-5-3-时间持续性">5.3 时间持续性</a>
+<a class="toc-link toc-sub" href="#method-5-4-放大集中">5.4 放大集中</a>
+<a class="toc-link " href="#method-6-背景控制层为什么不是附属品">6. 背景控制层为什么不是附属品</a>
+<a class="toc-link " href="#method-7-tshm-为什么不能做成一个总分模型">7. TSHM 为什么不能做成一个总分模型</a>
+<a class="toc-link " href="#method-8-公式独立与过程相关必须同时讲清">8. 公式独立与过程相关必须同时讲清</a>
 <a class="toc-link " href="#method-9-secr-如何把结构风险接回动作空间">9. SECR 如何把结构风险接回动作空间</a>
-<a class="toc-link " href="#method-10-为什么强调结构保持">10. 为什么强调结构保持</a>
-<a class="toc-link " href="#method-11-局部增量风险近似的作用">11. 局部增量风险近似的作用</a>
-<a class="toc-link " href="#method-12-方法链的压缩表达">12. 方法链的压缩表达</a>
+<a class="toc-link " href="#method-10-为什么必须使用局部增量风险近似">10. 为什么必须使用局部增量风险近似</a>
+<a class="toc-link " href="#method-11-这条方法链真正完成了什么桥接">11. 这条方法链真正完成了什么桥接</a>
 <a class="toc-link " href="#protocol">技术解释二：理论、评估与边界</a>
-<a class="toc-link " href="#protocol-1-理论部分解决什么问题">1. 理论部分解决什么问题</a>
+<a class="toc-link " href="#protocol-1-理论部分在这篇论文里承担什么角色">1. 理论部分在这篇论文里承担什么角色</a>
 <a class="toc-link " href="#protocol-2-命题-1-旋度与势流可分">2. 命题 1：旋度与势流可分</a>
 <a class="toc-link " href="#protocol-3-命题-2-受限条件下的贪心近似">3. 命题 2：受限条件下的贪心近似</a>
 <a class="toc-link " href="#protocol-4-命题-3-审计范围边界">4. 命题 3：审计范围边界</a>
-<a class="toc-link " href="#protocol-5-为什么评估要分三层证据">5. 为什么评估要分三层证据</a>
-<a class="toc-link " href="#protocol-6-数据集分别承担什么角色">6. 数据集分别承担什么角色</a>
-<a class="toc-link " href="#protocol-7-诊断指标与策略指标为何必须同时报告">7. 诊断指标与策略指标为何必须同时报告</a>
-<a class="toc-link " href="#protocol-8-失败判据为什么要前置">8. 失败判据为什么要前置</a>
-<a class="toc-link " href="#protocol-9-当前必须守住的解释边界">9. 当前必须守住的解释边界</a>
-<a class="toc-link " href="#protocol-10-伦理与局限性">10. 伦理与局限性</a>
-<a class="toc-link " href="#protocol-11-论文的学术定位">11. 论文的学术定位</a>
-<a class="toc-link " href="#protocol-12-收束表达">12. 收束表达</a>
+<a class="toc-link " href="#protocol-5-为什么要显式讨论标签噪声">5. 为什么要显式讨论标签噪声</a>
+<a class="toc-link " href="#protocol-6-评估为什么必须分成三层证据">6. 评估为什么必须分成三层证据</a>
+<a class="toc-link " href="#protocol-7-为什么同时报告区分度-校准和策略代价">7. 为什么同时报告区分度、校准和策略代价</a>
+<a class="toc-link " href="#protocol-8-为什么策略距离必须和-ndcg-一起报告">8. 为什么策略距离必须和 NDCG 一起报告</a>
+<a class="toc-link " href="#protocol-9-为什么要把跨群体曝光质量单独拉出来">9. 为什么要把跨群体曝光质量单独拉出来</a>
+<a class="toc-link " href="#protocol-10-失败判据为什么必须提前公布">10. 失败判据为什么必须提前公布</a>
+<a class="toc-link " href="#protocol-11-当前必须守住的解释边界">11. 当前必须守住的解释边界</a>
+<a class="toc-link " href="#protocol-12-这篇论文最稳的学术定位">12. 这篇论文最稳的学术定位</a>
         </div>
       </aside>
     </section>

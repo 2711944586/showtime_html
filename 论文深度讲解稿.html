@@ -62,7 +62,7 @@
     }
 
     .page-shell {
-      max-width: 1440px;
+      max-width: 1480px;
       margin: 0 auto;
       padding: 28px 24px 64px;
     }
@@ -249,13 +249,16 @@
     }
 
     .content-area {
-      padding: 28px;
+      padding: 34px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(252, 246, 238, 0.92)),
+        radial-gradient(circle at top right, rgba(33, 79, 75, 0.05), transparent 38%);
     }
 
     .doc-block + .doc-block {
-      margin-top: 34px;
-      padding-top: 34px;
-      border-top: 1px solid rgba(68, 52, 36, 0.08);
+      margin-top: 42px;
+      padding-top: 42px;
+      border-top: 1px solid rgba(68, 52, 36, 0.1);
     }
 
     .doc-header {
@@ -289,6 +292,7 @@
 
     .doc-header p {
       margin: 10px 0 0;
+      max-width: 64ch;
       color: var(--text-muted);
       line-height: 1.8;
     }
@@ -350,27 +354,35 @@
     }
 
     .prose h2 {
-      margin: 28px 0 12px;
+      margin: 34px 0 14px;
       font-size: 28px;
       line-height: 1.18;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(68, 52, 36, 0.1);
     }
 
     .prose h3 {
-      margin: 22px 0 10px;
+      margin: 24px 0 10px;
       font-size: 20px;
       line-height: 1.28;
+      color: var(--accent-deep);
     }
 
     .prose p {
       margin: 0 0 14px;
+      max-width: 74ch;
       color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.92;
     }
 
     .prose ul,
     .prose ol {
       margin: 0 0 18px;
+      max-width: 72ch;
       padding-left: 1.3rem;
       color: var(--text-muted);
+      line-height: 1.85;
     }
 
     .prose li + li {
@@ -379,10 +391,13 @@
 
     .prose blockquote {
       margin: 0 0 18px;
-      padding: 16px 18px;
+      max-width: 76ch;
+      padding: 18px 20px;
       border-left: 3px solid rgba(154, 89, 48, 0.32);
-      border-radius: 0 16px 16px 0;
-      background: rgba(255, 248, 239, 0.78);
+      border-radius: 0 18px 18px 0;
+      background:
+        linear-gradient(180deg, rgba(255, 248, 239, 0.84), rgba(252, 243, 233, 0.82)),
+        radial-gradient(circle at top right, rgba(154, 89, 48, 0.06), transparent 40%);
       color: var(--text);
     }
 
@@ -418,6 +433,7 @@
       border: 1px solid rgba(33, 79, 75, 0.16);
       background: linear-gradient(180deg, rgba(240, 247, 245, 0.94), rgba(232, 241, 238, 0.88));
       color: var(--accent-alt);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
     .prose mjx-container {
@@ -550,41 +566,114 @@
       <h1 id="lecture-tsfb-tshm-secr-论文深度讲解稿">TSFB-TSHM-SECR 论文深度讲解稿</h1>
 <blockquote>对应论文：<code>../paper_ipm_main.md</code> 对应交互网站：<code>../04_交互网站/</code> 对应思维导图：<code>../05_思维导图/research_journey.html</code></blockquote>
 <h2 id="lecture-1-开场命题">1. 开场命题</h2>
-<p>这篇论文讨论的不是一次性的排序表现，而是推荐系统如何在重复可见性分配中持续塑造局部曝光结构。平台每次响应请求，都会把有限注意力重新分配给不同生产者；这些分配在时间窗口内累积成动态曝光图，并在三元组邻域中诱导方向性循环、跨群体隔离、时间持续性和放大集中四类结构条件。整场汇报围绕这条主线展开。</p>
-<h2 id="lecture-2-研究对象的重写">2. 研究对象的重写</h2>
-<p>论文首先改写研究对象。社交关系图描述的是潜在连接，互动图混合了平台曝光和用户反应，而平台真正控制的是请求到来时的推荐列表。因此，论文把研究对象从静态关系网络转成重复分配后形成的曝光结构，并把全文拆成三个层次：</p>
-<ol><li>行动层：请求、候选集、推荐列表。</li><li>审计层：时间窗口内诱导的动态曝光图。</li><li>诊断层：曝光图上的三元组结构条件。</li></ol>
-<p>这一改写决定了后面的理论、方法和评估都围绕分配过程展开，而不是围绕态度结果展开。</p>
+<p>这篇论文要解决的，不是单次排序列表是否足够“相关”，而是推荐系统在重复分配注意力的过程中，会不会持续塑造出某些局部结构条件。这些条件不是某个用户单独经历的，也不是某个单列表能够完整描述的，而是在时间窗口内累积到曝光图上的高阶模式。</p>
+<blockquote>一句话理解：平台每次响应请求时都在重新分配谁能看见谁；这些分配会留下结构痕迹，而论文就是在审计这些结构痕迹。</blockquote>
+<h2 id="lecture-2-研究对象为什么必须重写">2. 研究对象为什么必须重写</h2>
+<h3 id="lecture-2-1-从列表动作出发-而不是从态度结果出发">2.1 从列表动作出发，而不是从态度结果出发</h3>
+<p>论文首先把推荐系统重新定义为重复可见性分配机制。行动层只包含请求、候选集和输出列表；平台真正能控制的，就是“在这一次请求里把哪些内容放到哪些位置上”。</p>
+<p>单次动作的最小公式入口是位置加权曝光量：</p>
 <div class="math-block">\[e_{r,k}=\gamma^{k-1}q(a_{r,k},u_r)\]</div>
-<div class="math-block">\[f_t(i,j)=\sum_{\tau=t-w}^{t}\sum_{r\in\mathcal{R}_{\tau}:u_r=i}\sum_{k:c(a_{r,k})=j} e_{r,k}\]</div>
-<h2 id="lecture-3-四个研究缺口">3. 四个研究缺口</h2>
-<p>论文聚焦四个缺口。第一，现有审计工具大多停留在二元层，难以稳定识别局部方向性闭环。第二，固定权重指数容易被活跃度计数这类强基线匹配甚至超过，诊断必须转向数据驱动和校准化。第三，真实系统在请求和列表层上运作，仅在用户聚合层分析会丢失位置偏差与列表组成效应。第四，如果重排序器只最小化自身输出，评估链路就会变成自证闭环，因此诊断目标、标签定义和策略评估必须分开。</p>
-<h2 id="lecture-4-为什么选择三元组">4. 为什么选择三元组</h2>
-<p>三元组是当前框架中最小的高阶可计算单元。边级失衡可以回答“谁比谁更容易被看见”，但只有进入三元组，才能同时描述共同暴露、方向性不对称和局部闭环回流。Hodge 分解中的局部旋度分量只会在三角边界上显现，这意味着三元组层天然包含二元势流分析不可恢复的独立信息。</p>
-<h2 id="lecture-5-tsfb-三元组结构特征库">5. TSFB：三元组结构特征库</h2>
-<p>TSFB 把诊断拆成核心结构层和背景控制层。核心结构层对应四个机制对齐的特征：</p>
-<ul><li><code>C</code>：方向性循环，刻画局部非势流闭合。</li><li><code>I</code>：跨群体隔离，刻画三元组边界上的群体混合程度。</li><li><code>P</code>：时间持续性，区分一次性扰动与结构锁定。</li><li><code>A</code>：放大集中，识别曝光是否压在少数边上形成单向主导。</li></ul>
-<p>背景控制层吸收活跃度、局部体量、度不对称和列表上下文等非结构性变异。TSFB 的意义不在于制造一个新的手工总分，而在于把结构信号与强控制基线放入同一诊断框架中比较，验证结构层是否真的带来增量价值。</p>
-<h2 id="lecture-6-tshm-多任务校准风险模型">6. TSHM：多任务校准风险模型</h2>
-<p>TSHM 接收 TSFB 输出的特征向量，但预测目标不是四个结构分量的线性组合，而是三类独立定义的负面分配事件：结构性事件、分布性事件和复合性事件。这样做的关键价值在于，风险标签和输入特征在公式上被明确拆开，模型输出的是可校准的事件概率，而不是对结构指标的再次包装。</p>
-<p>TSHM 的表达重点有两个。第一，方向明确的输入可以施加单调约束，保证模型与机制假设对齐。第二，输出必须经过校准，才能作为审计触发器进入后续决策。论文承认标签和特征共享同一分配过程，但把这种共享过程依赖显式写入评估报告，而不是把它伪装成完全独立。</p>
-<div class="math-block">\[\hat{p}_{\sigma,t}^{\mathrm{agg}}=1-\prod_{m=1}^{3}\left(1-\hat{p}_{\sigma,t}^{(m)}\right)\]</div>
-<h2 id="lecture-7-secr-结构性外部性约束重排序">7. SECR：结构性外部性约束重排序</h2>
-<p>SECR 把结构风险重新接回列表级动作空间。它不是在聚合图上做抽象修补，而是在候选集中逐位置选择项目，同时平衡效用、提供者公平和结构性外部性惩罚。位置贪心、局部增量风险近似和邻域截断共同保证了方法可执行，也决定了它是一种受约束、结构保持、可审计的干预原型，而不是福利最优器。</p>
-<div class="math-block">\[\pi_r^\star=\arg\max_{\pi_r}\;\lambda_u U(\pi_r)-\lambda_f F(\pi_r)-\lambda_s S(\pi_r)\]</div>
-<h2 id="lecture-8-理论部分的作用">8. 理论部分的作用</h2>
-<p>论文的理论部分解决三件必要的可信度问题。命题 1 说明三元组层确实存在二元分析看不见的信息盲区；命题 2 给出受限条件下位置贪心的合理操作区间；命题 3 则把推断范围明确限制在结构条件层，不把风险分数扩展成态度变化或福利改善的因果证据。理论部分的价值在于限定方法能说什么，而不是夸大它已经证明了什么。</p>
-<h2 id="lecture-9-评估协议">9. 评估协议</h2>
-<p>现阶段网页和讲稿先按协议组织，不提前固化结果数值。评估采用三层证据架构：</p>
-<ol><li>公开日志数据评估：MIND、FINN.no Slates、KuaiRand。</li><li>机制隔离仿真：四类生成器失配压力测试。</li><li>历史重放：提供方向一致性和外部边界参考。</li></ol>
-<p>诊断侧关注 ROC AUC、PR AUC、Brier、ECE 和特征消融；策略侧关注 NDCG@K、提供者公平差距、用户公平差距、覆盖率、结构风险降幅和策略距离。失败判据同样前置写入协议：不能显著超过 ActivityCount、移除核心结构层后性能几乎不变、风险下降代价过高、校准误差超过阈值，这些情况都会直接削弱论文主张。</p>
+<p>这里的 \(\gamma\) 是位置衰减，\(q(a_{r,k},u_r)\) 是项目与请求用户之间的曝光质量。它把“一个项目被排到第 \(k\) 位”翻译成了“系统向图里注入了多少曝光流量”。</p>
+<h3 id="lecture-2-2-审计对象不是列表本身-而是动态曝光图">2.2 审计对象不是列表本身，而是动态曝光图</h3>
+<p>当这些请求不断重复，平台就不再只是生成单次列表，而是在时间窗口上累积出一个动态曝光图：</p>
+<div class="math-block">\[f_t(i,j)=\sum_{\tau=t-w}^{t}\sum_{r\in\mathcal R_\tau:u_r=i}\sum_{k:c(a_{r,k})=j} e_{r,k}\]</div>
+<div class="math-block">\[G_t=(\mathcal U,E_t,f_t)\]</div>
+<p>这里 \(f_t(i,j)\) 表示在窗口 \([t-w,t]\) 内，用户 \(i\) 对创作者 \(j\) 的内容累计看到了多少位置加权曝光。这个对象很关键，因为它说明论文真正审计的是“日志诱导出来的结构”，而不是社交图、互动图或者单个列表的静态属性。</p>
+<h3 id="lecture-2-3-诊断对象是三元组结构条件">2.3 诊断对象是三元组结构条件</h3>
+<p>论文再往前走一步，把诊断对象固定为曝光图上的三元组 \(\sigma=[i,j,k]\)。三元组不是任意选的；它是局部方向性闭环首次可见的最小高阶单元。</p>
+<blockquote>如果只停留在边级，你最多能说“谁比谁被更多地看到”；但只有进入三元组，你才能说“信息是否沿着局部闭环持续回流”。</blockquote>
+<h2 id="lecture-3-为什么一定是三元组-而不是二元指标">3. 为什么一定是三元组，而不是二元指标</h2>
+<p>理论部分给出的根本理由来自 Hodge 分解。边信号可以拆成梯度项、调和项和旋度项：</p>
+<div class="math-block">\[f=B_1\phi+h+B_2^\top\psi\]</div>
+<p>三元组局部旋度由</p>
+<div class="math-block">\[\kappa_\sigma=(B_2f)_\sigma\]</div>
+<p>给出。这个结果最重要的含义，不是“论文用了一个高级数学工具”，而是：旋度分量和势流分量正交。也就是说，三元组层里确实存在一类二元势流分析看不见的局部方向性信息。论文就是把这块信息单独挖了出来。</p>
+<h2 id="lecture-4-tsfb-三元组结构特征库到底在做什么">4. TSFB：三元组结构特征库到底在做什么</h2>
+<p>TSFB 不是简单做一个指标集合，而是在回答四种不同的机制问题。它由核心结构层和背景控制层组成。背景控制层负责把活跃度计数、局部体量、上下文和标签不确定性这些强混杂因素吸收掉；核心结构层负责表达真正的结构信号。</p>
+<h3 id="lecture-4-1-为什么要先构造方向感知边信号">4.1 为什么要先构造方向感知边信号</h3>
+<p>原始边权是非负的，只能表达体量，不能表达方向性失衡。为了让 Hodge 旋度读到“互惠失衡”而不是“纯体量差”，论文先定义：</p>
+<div class="math-block">\[f_t^{(q)}(e)=|f_t(e)|^q\cdot \mathrm{sgn}\!\big(f_t(e)-f_t(\bar e)\big)\]</div>
+<p>这个式子的意义是：幅度保留边的强弱，符号记录边与反向边的互惠差异。只有这样，后面的旋度才会真正对应“方向性结构条件”。</p>
+<h3 id="lecture-4-2-四个核心特征分别测什么">4.2 四个核心特征分别测什么</h3>
+<p>方向性循环：</p>
+<div class="math-block">\[\mathcal C_\sigma(t)=\frac{\lvert \kappa_\sigma^{(q)}(t)\rvert}{\sum_{e\in\partial\sigma}\lvert f_t^{(q)}(e)\rvert+\epsilon}\]</div>
+<p>它测的是局部非势流闭合，回答“是否存在沿着三角边界持续回流的方向性结构”。</p>
+<p>跨群体隔离：</p>
+<div class="math-block">\[\mathcal I_\sigma(t)=1-\frac{\lvert\{e\in\partial\sigma:g(\mathrm{src}(e))\neq g(\mathrm{tgt}(e))\}\rvert}{\lvert\partial\sigma\rvert}\]</div>
+<p>它看的是边界上的边是否主要在群体内部闭合。数值越高，局部接触越封闭。</p>
+<p>时间持续性：</p>
+<div class="math-block">\[\mathcal P_\sigma(t)=\frac{1}{\lvert\partial\sigma\rvert}\sum_{e\in\partial\sigma}\cos\!\big(\mathbf f_t(e),\mathbf f_{t-1}(e)\big)\]</div>
+<p>它区分“一次性波动”和“跨窗口锁定”。持续性高，意味着结构模式不是偶然噪声。</p>
+<p>放大集中：</p>
+<div class="math-block">\[\mathcal A_\sigma(t)=\mathrm{HHI}_{\mathrm{norm}}\!\Big(\{f_t^{(q)}(e)\}_{e\in\partial\sigma}\Big)\]</div>
+<p>它看的是曝光是否被压在少数边上，回答“这里是不是已经形成单向主导和局部放大”。</p>
+<blockquote>TSFB 的关键不是四个特征彼此独立，而是它们分别对准四种不同机制。只要在背景控制层存在时它们仍有增量价值，框架就站得住。</blockquote>
+<h2 id="lecture-5-tshm-为什么必须做成多任务风险模型">5. TSHM：为什么必须做成多任务风险模型</h2>
+<p>论文没有把 TSFB 特征简单加权求和，而是把诊断目标单独制度化为三类负面事件。这样做的原因很重要：特征和标签必须在公式上分开，才能避免“模型只是把自己输入的指标换一种方式再输出一遍”。</p>
+<h3 id="lecture-5-1-三类负面事件">5.1 三类负面事件</h3>
+<p>结构性负面事件：</p>
+<div class="math-block">\[Y_{\sigma,t+1}^{\mathrm{struct}}=\mathbf1\!\left[\mathrm{ExposureGini}(\sigma,t+1)-\mathrm{ExposureGini}(\sigma,t)&gt;\delta_1\;\mathrm{or}\;\mathrm{CrossGroupDiv}(\sigma,t+1)&lt;\tau_2\right]\]</div>
+<p>这类标签回答的是局部结构条件是否恶化。</p>
+<p>分布性负面事件：</p>
+<div class="math-block">\[Y_{\sigma,t+1}^{\mathrm{alloc}}=\mathbf1\!\left[\Delta\mathrm{ProviderGap}&gt;\delta_3\;\mathrm{or}\;\Delta\mathrm{UserQualityDisparity}&gt;\delta_4\;\mathrm{or}\;\mathrm{TailStarvation}&gt;\delta_5\right]\]</div>
+<p>这类标签回答的是分配公平是否恶化。</p>
+<p>复合性负面事件：</p>
+<div class="math-block">\[Y_{\sigma,t+1}^{\mathrm{comp}}=Y_{\sigma,t+1}^{\mathrm{struct}}Y_{\sigma,t+1}^{\mathrm{alloc}}\]</div>
+<p>它只在结构恶化和分配恶化同时出现时触发。</p>
+<h3 id="lecture-5-2-风险输出怎么进入后续动作">5.2 风险输出怎么进入后续动作</h3>
+<p>TSHM 输出多任务风险向量：</p>
+<div class="math-block">\[\hat{\mathbf p}_{\sigma,t}=\big(\hat p_{\sigma,t}^{(1)},\hat p_{\sigma,t}^{(2)},\hat p_{\sigma,t}^{(3)}\big)\]</div>
+<p>默认聚合风险写成：</p>
+<div class="math-block">\[\hat p_{\sigma,t}^{\mathrm{agg}}=1-\prod_{m=1}^{3}\big(1-\hat p_{\sigma,t}^{(m)}\big)\]</div>
+<p>这个聚合风险只是默认操作入口，不是理论上唯一正确的风险聚合。若平台只关心结构性恶化，也可以直接把单任务风险送到 SECR。</p>
+<h3 id="lecture-5-3-tshm-最容易被误解的地方">5.3 TSHM 最容易被误解的地方</h3>
+<p>TSHM 与 TSFB 在<strong>公式上独立</strong>，因为标签由 ExposureGini、CrossGroupDiv、ProviderGap 等结果函数定义，而这些函数形式与旋度比、标签比例、余弦相似度和 HHI 不同。</p>
+<p>但它们在<strong>过程上不独立</strong>，因为二者都来自同一分配过程产生的边权数据。这种共享过程依赖不能被假装消除，论文必须把它写进评估报告，而不是把模型吹成完全独立的风险识别器。</p>
+<h2 id="lecture-6-secr-结构风险如何重新回到列表级动作空间">6. SECR：结构风险如何重新回到列表级动作空间</h2>
+<p>论文的第三步不是在图上做抽象修补，而是在每次请求到来时重新排序候选集。SECR 的总目标写成：</p>
+<div class="math-block">\[\mathbf a_r^\star=\arg\max_{\mathbf a_r\in\Pi_K(C_r)}\Big[\lambda_u U(\mathbf a_r,u_r)+\lambda_fF(\mathbf a_r)-\lambda_sS(\mathbf a_r,G_t)\Big]\]</div>
+<p>其中效用项为</p>
+<div class="math-block">\[U(\mathbf a_r,u_r)=\sum_{k=1}^{K}\gamma^{k-1}\hat u(a_{r,k},u_r)\]</div>
+<p>提供者公平项为</p>
+<div class="math-block">\[F_{\mathrm{provider}}(\mathbf a_r)=-\left|\frac{1}{K}\sum_{k=1}^{K}\mathbf1[c(a_{r,k})\in\mathcal G_{\mathrm{under}}]-\pi_{\mathrm{target}}\right|\]</div>
+<p>结构性外部性项通过局部增量风险写入：</p>
+<div class="math-block">\[S(\mathbf a_r,G_t)=\sum_{k=1}^{K}\gamma^{k-1}\widehat{\Delta S}(a_{r,k},k\mid r,G_t)\]</div>
+<h3 id="lecture-6-1-为什么必须做局部近似">6.1 为什么必须做局部近似</h3>
+<p>如果每个候选进入每个位置都完整重算一次 TSFB 和 TSHM，方法根本无法运行。所以论文采用一阶近似：</p>
+<div class="math-block">\[\Delta\hat p_{\sigma,t}^{\mathrm{agg}}(v,k)\approx \nabla_{\mathbf z}\hat p^{\mathrm{agg}}\Big|_{\mathbf z=\mathbf z_{\sigma,t}}\cdot \Delta\mathbf z_\sigma(v,k)\]</div>
+<p>这一步非常关键。它说明 SECR 不是精确求全图最优，而是在可执行性和结构保持之间找到了一个受约束的工程解。</p>
+<blockquote>一句话理解：SECR 不是“重写整个网络”，而是在当前请求上做最小必要改动，让风险信号真正影响到列表级动作。</blockquote>
+<h2 id="lecture-7-理论部分到底保护了什么">7. 理论部分到底保护了什么</h2>
+<h3 id="lecture-7-1-命题-1-三元组层有不可替代的信息增量">7.1 命题 1：三元组层有不可替代的信息增量</h3>
+<p>命题 1 说明局部旋度和势流正交，因此三元组层确实包含二元分析不可恢复的信息盲区。这是 TSFB 中 \(\mathcal C\) 最重要的理论支点。</p>
+<h3 id="lecture-7-2-命题-2-secr-的贪心是受限合理-不是全局最优">7.2 命题 2：SECR 的贪心是受限合理，不是全局最优</h3>
+<p>在效用可分、结构项局部近似、邻域截断 \(L=1\)、公平项可写成基数约束的前提下，论文给出：</p>
+<div class="math-block">\[U(\mathbf a_r^{\mathrm{greedy}})\geq (1-1/e)\cdot U(\mathbf a_r^\star)\]</div>
+<p>这个界只覆盖受限条件下的效用分量，不是完整三项目标的通用近似保证。它证明的是“存在一个清楚界定的可操作区间”，而不是“SECR 在任意条件下都近似最优”。</p>
+<h3 id="lecture-7-3-命题-3-论文必须停留在结构条件层">7.3 命题 3：论文必须停留在结构条件层</h3>
+<p>论文明确把因果链写成：</p>
+<div class="math-block">\[\text{分配决策}\to G_t\to \text{三元组结构条件}\to [\text{中介过程}]\to \text{态度/行为结果}\]</div>
+<p>TSFB 和 TSHM 只覆盖中间这段“曝光图 \(\to\) 三元组条件”的链条，因此其输出只能被解释为结构风险触发器，不能被扩写成态度变化或福利改善的因果证据。</p>
+<h2 id="lecture-8-评估协议为什么要先于结果固定">8. 评估协议为什么要先于结果固定</h2>
+<p>这篇论文现在还没有把正式实验结果写死，但协议已经足够完整。评估分成三层：</p>
+<ol><li>公开日志数据：回答请求级诊断和策略对比。</li><li>机制隔离仿真：回答方法在不同生成世界下如何退化。</li><li>历史重放：回答方向一致性和边界检查。</li></ol>
+<h3 id="lecture-8-1-诊断层必须同时报告区分度和校准">8.1 诊断层必须同时报告区分度和校准</h3>
+<p>ECE 定义为：</p>
 <div class="math-block">\[\mathrm{ECE}=\sum_{b=1}^{B}\frac{|B_b|}{n}\left|\mathrm{acc}(B_b)-\mathrm{conf}(B_b)\right|\]</div>
-<h2 id="lecture-10-当前的解释边界">10. 当前的解释边界</h2>
-<p>当前版本最重要的边界有三条。第一，结构风险下降不等于态度改善。第二，结构信号不是现实平台治理的最终答案。第三，历史重放和仿真结果不能替代线上随机实验。这三条边界越清楚，论文作为方法稿就越稳。</p>
-<h2 id="lecture-11-图表与结果页的接入顺序">11. 图表与结果页的接入顺序</h2>
-<p>结果图表完成后，页面将按统一顺序接入：框架总览图、三层对象图、TSFB 四分量机制图、TSHM 标签与校准结果、SECR 列表级干预流程图、三层证据总览图，以及正式实验结果图和消融图。当前讲解页只保留这套叙事骨架，不提前写死尚未冻结的数值。</p>
-<h2 id="lecture-12-收束口径">12. 收束口径</h2>
-<p>这篇论文提供的不是“现实平台回音室问题的终局答案”，而是一套面向推荐曝光分配的结构风险审计框架。它把对象定义、风险诊断、列表级干预和解释边界写成完整链路；等实验结果和图形资产完成后，交互网站、研究导图和讲解页可以在不改主结构的前提下继续接入结果层内容。</p>
+<p>Brier 分数定义为：</p>
+<div class="math-block">\[\mathrm{Brier}^{(m)}=\frac{1}{n}\sum_{i=1}^{n}\big(\hat p_i^{(m)}-y_i^{(m)}\big)^2\]</div>
+<p>如果只报 AUC，不报 ECE 和 Brier，读者无法判断风险输出是否真的可以进入审计触发流程。</p>
+<h3 id="lecture-8-2-策略层还要报告代价">8.2 策略层还要报告代价</h3>
+<p>结构风险下降如果不和策略距离一起报告，就无法知道系统付出了多少排序改动：</p>
+<div class="math-block">\[d_{\mathrm{strategy}}(\mathbf a_r^{\mathrm{SECR}},\mathbf a_r^{\mathrm{base}})=1-\tau_K(\mathbf a_r^{\mathrm{SECR}},\mathbf a_r^{\mathrm{base}})\]</div>
+<p>这条式子提醒我们：SECR 的价值不是“把风险降得越低越好”，而是“在效用、公平和结构风险之间形成可解释的权衡”。</p>
+<h2 id="lecture-9-失败判据为什么必须提前写进正文">9. 失败判据为什么必须提前写进正文</h2>
+<p>如果论文等结果出来后再决定什么算失败，它就很容易滑向选择性叙述。因此手稿提前写入了四类关键失败情形：</p>
+<ol><li>TSHM 不能显著超过 ActivityCount。</li><li>去掉全部核心结构特征后性能几乎不变。</li><li>SECR 的结构风险下降伴随超过 15% 的 NDCG 损失。</li><li>后验校准后仍有任务的 ECE 高于 0.10。</li></ol>
+<p>这四条失败判据有一个共同目标：让论文把“什么时候应该主动收缩主张”提前公开，而不是把负面结果埋在附录里。</p>
+<h2 id="lecture-10-最终定位">10. 最终定位</h2>
+<p>这篇论文最稳的定位，不是“已经证明现实平台回音室问题该怎样被彻底解决”，而是“提出了一套对象定义清楚、方法链完整、理论边界明确、实验协议执行就绪的结构风险审计框架”。 它的强项在于把分配、结构、风险和动作写成闭环；它的诚实之处在于，明确承认自己并不直接识别态度变化或福利效应。</p>
+<blockquote>收束句：这篇论文真正贡献的，是把“推荐系统会留下怎样的局部结构条件”这件事，从模糊讨论变成了可定义、可诊断、可约束、可失败的研究对象。</blockquote>
     </article>
   </section>
   
@@ -594,17 +683,29 @@
         <div class="toc-links">
           <a class="toc-link " href="#lecture">论文深度讲解稿</a>
 <a class="toc-link " href="#lecture-1-开场命题">1. 开场命题</a>
-<a class="toc-link " href="#lecture-2-研究对象的重写">2. 研究对象的重写</a>
-<a class="toc-link " href="#lecture-3-四个研究缺口">3. 四个研究缺口</a>
-<a class="toc-link " href="#lecture-4-为什么选择三元组">4. 为什么选择三元组</a>
-<a class="toc-link " href="#lecture-5-tsfb-三元组结构特征库">5. TSFB：三元组结构特征库</a>
-<a class="toc-link " href="#lecture-6-tshm-多任务校准风险模型">6. TSHM：多任务校准风险模型</a>
-<a class="toc-link " href="#lecture-7-secr-结构性外部性约束重排序">7. SECR：结构性外部性约束重排序</a>
-<a class="toc-link " href="#lecture-8-理论部分的作用">8. 理论部分的作用</a>
-<a class="toc-link " href="#lecture-9-评估协议">9. 评估协议</a>
-<a class="toc-link " href="#lecture-10-当前的解释边界">10. 当前的解释边界</a>
-<a class="toc-link " href="#lecture-11-图表与结果页的接入顺序">11. 图表与结果页的接入顺序</a>
-<a class="toc-link " href="#lecture-12-收束口径">12. 收束口径</a>
+<a class="toc-link " href="#lecture-2-研究对象为什么必须重写">2. 研究对象为什么必须重写</a>
+<a class="toc-link toc-sub" href="#lecture-2-1-从列表动作出发-而不是从态度结果出发">2.1 从列表动作出发，而不是从态度结果出发</a>
+<a class="toc-link toc-sub" href="#lecture-2-2-审计对象不是列表本身-而是动态曝光图">2.2 审计对象不是列表本身，而是动态曝光图</a>
+<a class="toc-link toc-sub" href="#lecture-2-3-诊断对象是三元组结构条件">2.3 诊断对象是三元组结构条件</a>
+<a class="toc-link " href="#lecture-3-为什么一定是三元组-而不是二元指标">3. 为什么一定是三元组，而不是二元指标</a>
+<a class="toc-link " href="#lecture-4-tsfb-三元组结构特征库到底在做什么">4. TSFB：三元组结构特征库到底在做什么</a>
+<a class="toc-link toc-sub" href="#lecture-4-1-为什么要先构造方向感知边信号">4.1 为什么要先构造方向感知边信号</a>
+<a class="toc-link toc-sub" href="#lecture-4-2-四个核心特征分别测什么">4.2 四个核心特征分别测什么</a>
+<a class="toc-link " href="#lecture-5-tshm-为什么必须做成多任务风险模型">5. TSHM：为什么必须做成多任务风险模型</a>
+<a class="toc-link toc-sub" href="#lecture-5-1-三类负面事件">5.1 三类负面事件</a>
+<a class="toc-link toc-sub" href="#lecture-5-2-风险输出怎么进入后续动作">5.2 风险输出怎么进入后续动作</a>
+<a class="toc-link toc-sub" href="#lecture-5-3-tshm-最容易被误解的地方">5.3 TSHM 最容易被误解的地方</a>
+<a class="toc-link " href="#lecture-6-secr-结构风险如何重新回到列表级动作空间">6. SECR：结构风险如何重新回到列表级动作空间</a>
+<a class="toc-link toc-sub" href="#lecture-6-1-为什么必须做局部近似">6.1 为什么必须做局部近似</a>
+<a class="toc-link " href="#lecture-7-理论部分到底保护了什么">7. 理论部分到底保护了什么</a>
+<a class="toc-link toc-sub" href="#lecture-7-1-命题-1-三元组层有不可替代的信息增量">7.1 命题 1：三元组层有不可替代的信息增量</a>
+<a class="toc-link toc-sub" href="#lecture-7-2-命题-2-secr-的贪心是受限合理-不是全局最优">7.2 命题 2：SECR 的贪心是受限合理，不是全局最优</a>
+<a class="toc-link toc-sub" href="#lecture-7-3-命题-3-论文必须停留在结构条件层">7.3 命题 3：论文必须停留在结构条件层</a>
+<a class="toc-link " href="#lecture-8-评估协议为什么要先于结果固定">8. 评估协议为什么要先于结果固定</a>
+<a class="toc-link toc-sub" href="#lecture-8-1-诊断层必须同时报告区分度和校准">8.1 诊断层必须同时报告区分度和校准</a>
+<a class="toc-link toc-sub" href="#lecture-8-2-策略层还要报告代价">8.2 策略层还要报告代价</a>
+<a class="toc-link " href="#lecture-9-失败判据为什么必须提前写进正文">9. 失败判据为什么必须提前写进正文</a>
+<a class="toc-link " href="#lecture-10-最终定位">10. 最终定位</a>
         </div>
       </aside>
     </section>
