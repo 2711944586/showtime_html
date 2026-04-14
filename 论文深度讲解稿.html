@@ -4,6 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>推荐曝光结构外部性审计：论文深度讲解稿</title>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]],
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]],
+      },
+      svg: {
+        fontCache: "global",
+      },
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -398,6 +410,29 @@
       color: inherit;
     }
 
+    .math-block {
+      margin: 0 0 20px;
+      padding: 16px 18px;
+      overflow-x: auto;
+      border-radius: 18px;
+      border: 1px solid rgba(33, 79, 75, 0.16);
+      background: linear-gradient(180deg, rgba(240, 247, 245, 0.94), rgba(232, 241, 238, 0.88));
+      color: var(--accent-alt);
+    }
+
+    .prose mjx-container {
+      max-width: 100%;
+    }
+
+    .prose mjx-container[jax="SVG"] {
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .math-block mjx-container {
+      margin: 0 !important;
+    }
+
     .footer {
       margin-top: 28px;
       color: var(--text-soft);
@@ -520,6 +555,8 @@
 <p>论文首先改写研究对象。社交关系图描述的是潜在连接，互动图混合了平台曝光和用户反应，而平台真正控制的是请求到来时的推荐列表。因此，论文把研究对象从静态关系网络转成重复分配后形成的曝光结构，并把全文拆成三个层次：</p>
 <ol><li>行动层：请求、候选集、推荐列表。</li><li>审计层：时间窗口内诱导的动态曝光图。</li><li>诊断层：曝光图上的三元组结构条件。</li></ol>
 <p>这一改写决定了后面的理论、方法和评估都围绕分配过程展开，而不是围绕态度结果展开。</p>
+<div class="math-block">\[e_{r,k}=\gamma^{k-1}q(a_{r,k},u_r)\]</div>
+<div class="math-block">\[f_t(i,j)=\sum_{\tau=t-w}^{t}\sum_{r\in\mathcal{R}_{\tau}:u_r=i}\sum_{k:c(a_{r,k})=j} e_{r,k}\]</div>
 <h2 id="lecture-3-四个研究缺口">3. 四个研究缺口</h2>
 <p>论文聚焦四个缺口。第一，现有审计工具大多停留在二元层，难以稳定识别局部方向性闭环。第二，固定权重指数容易被活跃度计数这类强基线匹配甚至超过，诊断必须转向数据驱动和校准化。第三，真实系统在请求和列表层上运作，仅在用户聚合层分析会丢失位置偏差与列表组成效应。第四，如果重排序器只最小化自身输出，评估链路就会变成自证闭环，因此诊断目标、标签定义和策略评估必须分开。</p>
 <h2 id="lecture-4-为什么选择三元组">4. 为什么选择三元组</h2>
@@ -531,14 +568,17 @@
 <h2 id="lecture-6-tshm-多任务校准风险模型">6. TSHM：多任务校准风险模型</h2>
 <p>TSHM 接收 TSFB 输出的特征向量，但预测目标不是四个结构分量的线性组合，而是三类独立定义的负面分配事件：结构性事件、分布性事件和复合性事件。这样做的关键价值在于，风险标签和输入特征在公式上被明确拆开，模型输出的是可校准的事件概率，而不是对结构指标的再次包装。</p>
 <p>TSHM 的表达重点有两个。第一，方向明确的输入可以施加单调约束，保证模型与机制假设对齐。第二，输出必须经过校准，才能作为审计触发器进入后续决策。论文承认标签和特征共享同一分配过程，但把这种共享过程依赖显式写入评估报告，而不是把它伪装成完全独立。</p>
+<div class="math-block">\[\hat{p}_{\sigma,t}^{\mathrm{agg}}=1-\prod_{m=1}^{3}\left(1-\hat{p}_{\sigma,t}^{(m)}\right)\]</div>
 <h2 id="lecture-7-secr-结构性外部性约束重排序">7. SECR：结构性外部性约束重排序</h2>
 <p>SECR 把结构风险重新接回列表级动作空间。它不是在聚合图上做抽象修补，而是在候选集中逐位置选择项目，同时平衡效用、提供者公平和结构性外部性惩罚。位置贪心、局部增量风险近似和邻域截断共同保证了方法可执行，也决定了它是一种受约束、结构保持、可审计的干预原型，而不是福利最优器。</p>
+<div class="math-block">\[\pi_r^\star=\arg\max_{\pi_r}\;\lambda_u U(\pi_r)-\lambda_f F(\pi_r)-\lambda_s S(\pi_r)\]</div>
 <h2 id="lecture-8-理论部分的作用">8. 理论部分的作用</h2>
 <p>论文的理论部分解决三件必要的可信度问题。命题 1 说明三元组层确实存在二元分析看不见的信息盲区；命题 2 给出受限条件下位置贪心的合理操作区间；命题 3 则把推断范围明确限制在结构条件层，不把风险分数扩展成态度变化或福利改善的因果证据。理论部分的价值在于限定方法能说什么，而不是夸大它已经证明了什么。</p>
 <h2 id="lecture-9-评估协议">9. 评估协议</h2>
 <p>现阶段网页和讲稿先按协议组织，不提前固化结果数值。评估采用三层证据架构：</p>
 <ol><li>公开日志数据评估：MIND、FINN.no Slates、KuaiRand。</li><li>机制隔离仿真：四类生成器失配压力测试。</li><li>历史重放：提供方向一致性和外部边界参考。</li></ol>
 <p>诊断侧关注 ROC AUC、PR AUC、Brier、ECE 和特征消融；策略侧关注 NDCG@K、提供者公平差距、用户公平差距、覆盖率、结构风险降幅和策略距离。失败判据同样前置写入协议：不能显著超过 ActivityCount、移除核心结构层后性能几乎不变、风险下降代价过高、校准误差超过阈值，这些情况都会直接削弱论文主张。</p>
+<div class="math-block">\[\mathrm{ECE}=\sum_{b=1}^{B}\frac{|B_b|}{n}\left|\mathrm{acc}(B_b)-\mathrm{conf}(B_b)\right|\]</div>
 <h2 id="lecture-10-当前的解释边界">10. 当前的解释边界</h2>
 <p>当前版本最重要的边界有三条。第一，结构风险下降不等于态度改善。第二，结构信号不是现实平台治理的最终答案。第三，历史重放和仿真结果不能替代线上随机实验。这三条边界越清楚，论文作为方法稿就越稳。</p>
 <h2 id="lecture-11-图表与结果页的接入顺序">11. 图表与结果页的接入顺序</h2>

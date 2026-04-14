@@ -4,6 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>推荐曝光结构外部性审计：技术解释手册</title>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]],
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]],
+      },
+      svg: {
+        fontCache: "global",
+      },
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -398,6 +410,29 @@
       color: inherit;
     }
 
+    .math-block {
+      margin: 0 0 20px;
+      padding: 16px 18px;
+      overflow-x: auto;
+      border-radius: 18px;
+      border: 1px solid rgba(33, 79, 75, 0.16);
+      background: linear-gradient(180deg, rgba(240, 247, 245, 0.94), rgba(232, 241, 238, 0.88));
+      color: var(--accent-alt);
+    }
+
+    .prose mjx-container {
+      max-width: 100%;
+    }
+
+    .prose mjx-container[jax="SVG"] {
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .math-block mjx-container {
+      margin: 0 !important;
+    }
+
     .footer {
       margin-top: 28px;
       color: var(--text-soft);
@@ -517,16 +552,23 @@
 <p>这篇论文最重要的结构安排，是把行动对象、审计对象和诊断对象彻底拆开。行动对象是请求、候选集和推荐列表；审计对象是时间窗口内累积形成的动态曝光图；诊断对象是曝光图上的三元组结构条件。这样的拆分避免了最常见的对象混淆。平台真正控制的是列表级分配，而不是用户态度；审计者真正能观察的是分配诱导出的结构，而不是心理结果本身。</p>
 <h2 id="method-2-动态曝光图如何构造">2. 动态曝光图如何构造</h2>
 <p>动态曝光图来自列表级日志，而不是来自社交关系。对每次请求，系统从候选集中给出前 <code>K</code> 个项目；每个位置贡献一个位置折扣后的曝光量 <code>e_(r,k)</code>；在固定时间窗口内，把用户 <code>i</code> 对创作者 <code>j</code> 的累计曝光聚合成有向边权 <code>f_t(i,j)</code>。因此，曝光图的每条边都表示可见性分配的历史累积，而不是社交连接或互动结果。</p>
+<div class="math-block">\[e_{r,k}=\gamma^{k-1}q(a_{r,k},u_r), \qquad
+f_t(i,j)=\sum_{\tau=t-w}^{t}\sum_{r\in\mathcal{R}_{\tau}:u_r=i}\sum_{k:c(a_{r,k})=j} e_{r,k}\]</div>
 <h2 id="method-3-为什么诊断单元是三元组">3. 为什么诊断单元是三元组</h2>
 <p>二元分析只能处理成对不平衡，难以稳定描述局部方向性闭环。三元组则同时容纳共同暴露、方向性不对称和局部回流，是当前框架中最小的高阶可计算单元。Hodge 分解中的局部旋度只会在三角边界上显现，这就是三元组的理论意义，也是论文坚持从三元组而不是从边级定义结构条件的原因。</p>
 <h2 id="method-4-tsfb-的两层结构">4. TSFB 的两层结构</h2>
 <p>TSFB 由核心结构层和背景控制层组成。核心结构层负责表达机制，包括 <code>C</code>、<code>I</code>、<code>P</code>、<code>A</code> 四个特征；背景控制层负责吸收非结构性变异，包括活跃度计数、局部体量、曝光熵、创作者受欢迎度、新鲜度、度不对称、标签不确定性和列表上下文。核心层与控制层同时进入诊断模型，才能回答一个关键问题：结构信号是否真的提供了超出强基线的增量信息。</p>
 <h2 id="method-5-四个核心特征分别回答什么问题">5. 四个核心特征分别回答什么问题</h2>
 <p><code>C</code> 基于局部旋度构造，衡量三元组边界上的非势流闭合强度，用来识别持续性的方向性回流。<code>I</code> 描述三元组边界上内群体边的比例，用来衡量局部暴露是否主要被群体边界封闭。<code>P</code> 用相邻时间窗口中的边权相似度衡量结构是否持续存在，用来区分瞬时扰动与跨窗口锁定。<code>A</code> 则用归一化集中度刻画曝光是否压在少数边上，用来识别单向主导和局部放大。</p>
+<div class="math-block">\[C_{\sigma,t}=\frac{\lvert \kappa_{\sigma}^{(q)}(t)\rvert}{\sum_{e\in\partial\sigma}\lvert f_t^{(q)}(e)\rvert+\varepsilon},\quad
+I_{\sigma,t}=1-\frac{\lvert \partial\sigma \cap E_{\mathrm{cross}}\rvert}{\lvert \partial\sigma \rvert}\]</div>
+<div class="math-block">\[P_{\sigma,t}=\mathrm{mean}_{e\in\partial\sigma}\cos\!\big(f_t(e),f_{t-1}(e)\big),\quad
+A_{\sigma,t}=\mathrm{HHI}_{\mathrm{norm}}\!\left(\{f_t(e)\}_{e\in\partial\sigma}\right)\]</div>
 <h2 id="method-6-方向感知边信号为何这样定义">6. 方向感知边信号为何这样定义</h2>
 <p>论文没有把原始非负边权直接送入 Hodge 旋度，而是先构造方向感知边信号。原因很直接：原始边权只能表达体量大小，旋度需要有符号信号，才能区分方向性失衡和纯粹的规模不平衡。通过与反向边比较，符号来自互惠差异，幅度保留边权大小，旋度因此被解释为方向性结构条件，而不是单纯的强边叠加。</p>
 <h2 id="method-7-tshm-的目标定义">7. TSHM 的目标定义</h2>
 <p>TSHM 不预测一个手工拼接的大分数，而是预测三类独立定义的负面事件：结构性负面事件、分布性负面事件和复合负面事件。这些事件由集中度、跨群体多样性、提供者差距、用户质量差距和尾部饥饿等分配结果函数定义，而不是直接复用 TSFB 的公式。这样的设计把风险标签和结构特征在公式上拆开，使模型输出成为真正的事件概率。</p>
+<div class="math-block">\[\hat{p}_{\sigma,t}^{\mathrm{agg}}=1-\prod_{m=1}^{3}\left(1-\hat{p}_{\sigma,t}^{(m)}\right)\]</div>
 <h2 id="method-8-公式独立与过程相关">8. 公式独立与过程相关</h2>
 <p>TSHM 与 TSFB 的关系必须表达得足够准确。它们在公式上独立，因为标签和特征属于不同函数族；它们又在过程上相关，因为标签和特征都来自同一分配过程，底层共享边权数据。论文不回避这种共享过程依赖，而是把它透明报告出来，并要求后续评估显式展示核心层与控制层的信息贡献。</p>
 <h2 id="method-9-secr-如何把结构风险接回动作空间">9. SECR 如何把结构风险接回动作空间</h2>
@@ -535,6 +577,7 @@
 <p>SECR 的设计不是删边、重连或重写网络骨架，而是坚持四个约束：非负、源侧守恒、边级扰动有界和总预算有界。这四个约束决定了它更接近平台治理语境中的可审计调整，而不是脱离制度边界的全局最优器。它的价值在于提供一种可问责、可解释、可执行的重排序原型。</p>
 <h2 id="method-11-局部增量风险近似的作用">11. 局部增量风险近似的作用</h2>
 <p>如果每评估一个候选项目都完整重算 TSFB 与 TSHM，列表级干预几乎不可执行。因此论文采用局部一阶近似：只考虑新增边会影响到的局部三元组，只在这些三元组上更新特征扰动，再用校准风险对特征的局部梯度近似风险变化。这一步是 SECR 从理论对象进入实际动作空间的关键桥梁。</p>
+<div class="math-block">\[\Delta S(\pi_r)\approx \sum_{\sigma\in\mathcal{N}_L(u,v)} \nabla_{\mathbf z}\hat p_{\sigma,t}^{\mathrm{agg}}\cdot \Delta \mathbf z_{\sigma,t}\]</div>
 <h2 id="method-12-方法链的压缩表达">12. 方法链的压缩表达</h2>
 <p>整条方法链可以压缩成一句话：论文先把推荐系统写成重复可见性分配，再把分配诱导出的曝光图写成三元组结构条件，随后用校准风险模型识别值得审计的局部模式，最后把这些模式转化为列表级、结构保持、可审计的重排序约束。</p>
     </article>
@@ -553,8 +596,11 @@
 <p>论文的理论部分不追求笼统的全局最优性，而是解决三个更关键的问题：三元组层是否真的包含二元分析看不见的信息，SECR 这种位置贪心在什么条件下是合理的，以及风险分数的推断边界究竟到哪里为止。理论在这里承担的是限定能力范围的作用，而不是为方法制造过度主张。</p>
 <h2 id="protocol-2-命题-1-旋度与势流可分">2. 命题 1：旋度与势流可分</h2>
 <p>命题 1 为三元组分析提供理论锚点。边信号可以分解为梯度、调和和旋度三个正交分量，旋度只在三角边界上显现。这意味着三元组层天然保留了一类二元势流方法无法恢复的局部方向性信息。该命题不是在否定二元方法，而是在说明为什么高阶层诊断是必要的补充。</p>
+<div class="math-block">\[f_t^{(q)}=\nabla \phi_t + h_t + B_{2,t}^{\top}\omega_t, \qquad
+\kappa_{\sigma}^{(q)}(t)=\left(B_{2,t}f_t^{(q)}\right)_{\sigma}\]</div>
 <h2 id="protocol-3-命题-2-受限条件下的贪心近似">3. 命题 2：受限条件下的贪心近似</h2>
 <p>命题 2 只在明确约束下成立：效用函数可分、结构风险使用局部一阶近似、邻域截断为 <code>L = 1</code>，公平项可以写成可处理的基数约束。它的意义不在于证明 SECR 在所有设置下都最优，而在于说明在一个被清楚限定的操作区域内，位置贪心不是任意拼装出来的启发式。</p>
+<div class="math-block">\[\pi_r^\star=\arg\max_{\pi_r}\;\lambda_u U(\pi_r)-\lambda_f F(\pi_r)-\lambda_s S(\pi_r)\]</div>
 <h2 id="protocol-4-命题-3-审计范围边界">4. 命题 3：审计范围边界</h2>
 <p>命题 3 是最需要主动强调的理论结果。论文处理的是分配决策、曝光图和三元组结构条件，而不是用户态度变化、长期政治行为或社会福利结果。因此，风险分数只能被解释为审计触发器，不能被包装成态度或福利结果的替身。这个边界不是附带的免责声明，而是整篇论文成立的支柱。</p>
 <h2 id="protocol-5-为什么评估要分三层证据">5. 为什么评估要分三层证据</h2>
@@ -563,6 +609,7 @@
 <p>MIND 提供大规模新闻推荐日志，适合观察请求级诊断，但共印象仍然只是代理。FINN.no Slates 记录了更清晰的完整列表结构，适合讨论列表级动作空间。KuaiRand 则因为包含随机曝光子集，能为离策略评估提供更可信的锚点。数据集的价值不在于数量堆叠，而在于它们分别支持了对象层、评估层和策略层的不同需求。</p>
 <h2 id="protocol-7-诊断指标与策略指标为何必须同时报告">7. 诊断指标与策略指标为何必须同时报告</h2>
 <p>论文同时报告两类指标，是为了避免只凭内部风险分数自证。诊断指标包括 ROC AUC、PR AUC、Brier、ECE 和特征消融，它们回答风险模型本身是否可靠。策略指标包括 NDCG@K、提供者公平差距、用户公平差距、覆盖率、多样性、结构风险降幅和策略距离，它们回答把风险信号接回列表级动作之后，系统付出了什么代价，又换回了什么收益。</p>
+<div class="math-block">\[\mathrm{ECE}=\sum_{b=1}^{B}\frac{|B_b|}{n}\left|\mathrm{acc}(B_b)-\mathrm{conf}(B_b)\right|\]</div>
 <h2 id="protocol-8-失败判据为什么要前置">8. 失败判据为什么要前置</h2>
 <p>论文把失败判据直接写进协议，而不是等实验结束后再解释结果。这样做既防止选择性叙述，也让读者提前知道哪些情况会直接削弱主张。关键失败判据包括：TSHM 不能显著超过 ActivityCount、去掉核心结构层后性能几乎不下降、SECR 的效用损失过大，以及任一任务的校准误差超过预设阈值。</p>
 <h2 id="protocol-9-当前必须守住的解释边界">9. 当前必须守住的解释边界</h2>

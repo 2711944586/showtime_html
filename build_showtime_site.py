@@ -44,12 +44,27 @@ def slugify(text: str, prefix: str) -> str:
   return f"{prefix}-{text or 'section'}"
 
 
+def preserve_inline_math(text: str) -> tuple[str, dict[str, str]]:
+  tokens: dict[str, str] = {}
+
+  def stash(match: re.Match[str]) -> str:
+    token = f"__MATHTOKEN{len(tokens)}__"
+    tokens[token] = html.escape(match.group(0))
+    return token
+
+  protected = re.sub(r"\\\(.+?\\\)|(?<!\$)\$(?!\$).+?(?<!\$)\$(?!\$)", stash, text)
+  return protected, tokens
+
+
 def inline_format(text: str) -> str:
-  escaped = html.escape(text)
+  protected, math_tokens = preserve_inline_math(text)
+  escaped = html.escape(protected)
   escaped = re.sub(r"`([^`]+)`", r"<code>\1</code>", escaped)
   escaped = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", escaped)
   escaped = re.sub(r"\*([^*]+)\*", r"<em>\1</em>", escaped)
   escaped = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', escaped)
+  for token, value in math_tokens.items():
+    escaped = escaped.replace(token, value)
   return escaped
 
 
@@ -63,6 +78,8 @@ def render_markdown(markdown_text: str, prefix: str) -> tuple[str, list[dict[str
   list_kind: str | None = None
   in_code = False
   code_lines: list[str] = []
+  in_math = False
+  math_lines: list[str] = []
 
   def flush_paragraph() -> None:
     nonlocal paragraph
@@ -92,8 +109,23 @@ def render_markdown(markdown_text: str, prefix: str) -> tuple[str, list[dict[str
       parts.append(f"<pre><code>{code}</code></pre>")
       code_lines = []
 
+  def flush_math() -> None:
+    nonlocal math_lines
+    if math_lines:
+      formula = html.escape("\n".join(math_lines).strip())
+      parts.append(f"<div class=\"math-block\">\\[{formula}\\]</div>")
+      math_lines = []
+
   for raw_line in lines:
     line = raw_line.rstrip()
+
+    if in_math:
+      if line.strip() == "$$":
+        in_math = False
+        flush_math()
+      else:
+        math_lines.append(raw_line)
+      continue
 
     if in_code:
       if line.startswith("```"):
@@ -109,6 +141,23 @@ def render_markdown(markdown_text: str, prefix: str) -> tuple[str, list[dict[str
       flush_list()
       in_code = True
       code_lines = []
+      continue
+
+    single_line_math = re.match(r"^\$\$\s*(.*?)\s*\$\$$", line.strip())
+    if single_line_math:
+      flush_paragraph()
+      flush_quote()
+      flush_list()
+      formula = html.escape(single_line_math.group(1))
+      parts.append(f"<div class=\"math-block\">\\[{formula}\\]</div>")
+      continue
+
+    if line.strip() == "$$":
+      flush_paragraph()
+      flush_quote()
+      flush_list()
+      in_math = True
+      math_lines = []
       continue
 
     if not line.strip():
@@ -164,6 +213,7 @@ def render_markdown(markdown_text: str, prefix: str) -> tuple[str, list[dict[str
   flush_quote()
   flush_list()
   flush_code()
+  flush_math()
 
   return "\n".join(parts), toc
 
@@ -200,6 +250,18 @@ def page_template(title: str, subtitle: str, lead: str, quick_links_html: str, t
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{html.escape(title)}</title>
+  <script>
+    window.MathJax = {{
+      tex: {{
+        inlineMath: [["$", "$"], ["\\\\(", "\\\\)"]],
+        displayMath: [["$$", "$$"], ["\\\\[", "\\\\]"]],
+      }},
+      svg: {{
+        fontCache: "global",
+      }},
+    }};
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -592,6 +654,29 @@ def page_template(title: str, subtitle: str, lead: str, quick_links_html: str, t
       padding: 0;
       background: transparent;
       color: inherit;
+    }}
+
+    .math-block {{
+      margin: 0 0 20px;
+      padding: 16px 18px;
+      overflow-x: auto;
+      border-radius: 18px;
+      border: 1px solid rgba(33, 79, 75, 0.16);
+      background: linear-gradient(180deg, rgba(240, 247, 245, 0.94), rgba(232, 241, 238, 0.88));
+      color: var(--accent-alt);
+    }}
+
+    .prose mjx-container {{
+      max-width: 100%;
+    }}
+
+    .prose mjx-container[jax="SVG"] {{
+      overflow-x: auto;
+      overflow-y: hidden;
+    }}
+
+    .math-block mjx-container {{
+      margin: 0 !important;
     }}
 
     .footer {{

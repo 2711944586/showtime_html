@@ -1,39 +1,52 @@
-# 06_讲解稿
+# showtime_html
 
-本目录现在是一个独立的静态展示项目，用来承接论文讲解、技术解释与公开展示页面。
+论文讲解稿与技术解释稿的静态展示站，当前目录就是部署根目录。
 
-## 文件结构
+## 在线地址
 
-| 文件 | 用途 |
-| --- | --- |
-| `论文深度讲解稿.md` | 主讲稿源文件，负责整场汇报的叙事顺序与标准口径 |
-| `技术解释_对象与方法.md` | 技术解释一，负责对象层、方法链与约束解释 |
-| `技术解释_理论与评估.md` | 技术解释二，负责命题、评估协议、失败判据与边界 |
-| `build_showtime_site.py` | 静态构建脚本，生成全部 HTML |
-| `论文深度讲解稿.html` | 升级后的主讲页 |
-| `技术解释文档.html` | 升级后的技术解释页，合并两份技术解释文档 |
-| `index.html` | GitHub Pages 部署页，把主讲稿和两份技术解释合成一个页面 |
+- 合并页: `https://2711944586.github.io/showtime_html/`
+- 主讲稿: `https://2711944586.github.io/showtime_html/论文深度讲解稿.html`
+- 技术解释: `https://2711944586.github.io/showtime_html/技术解释文档.html`
 
-## 构建
+## 文件
+
+- `论文深度讲解稿.md`: 主讲稿源文件
+- `技术解释_对象与方法.md`: 技术解释一
+- `技术解释_理论与评估.md`: 技术解释二
+- `build_showtime_site.py`: 构建脚本
+- `index.html`: 合并部署页
+
+## 本地更新
 
 ```powershell
 python build_showtime_site.py
 ```
 
-## 部署
+构建后会更新：
 
-工作流文件：
+- `index.html`
+- `论文深度讲解稿.html`
+- `技术解释文档.html`
 
-`.github/workflows/deploy-showtime.yml`
+## 静态部署
 
-推送到 `main` 后会自动：
+工作流文件: `.github/workflows/deploy-showtime.yml`
 
-1. 运行 `python build_showtime_site.py`
-2. 生成三份 HTML
-3. 把当前目录作为 Pages 产物发布
+```powershell
+python build_showtime_site.py
+git add .
+git commit -m "Update showtime pages"
+git push origin main
+```
+
+推送后：
+
+1. 打开 `https://github.com/2711944586/showtime_html/actions`
+2. 等待部署工作流完成
+3. 打开上面的 Pages 地址
 
 ## 当前内容
 
-1. 主讲稿已经同步到最新版论文结构，围绕对象层、方法链和解释边界展开。
-2. 技术解释拆成“对象与方法”“理论与评估”两份源文档，并移除了旧论文缩写。
-3. 部署页 `index.html` 已把主讲稿和两份技术解释合成一个单页入口。
+1. 主讲稿、对象与方法、理论与评估三部分已经拆开维护。
+2. 页面会把 Markdown 渲染成统一风格的 HTML，并支持公式渲染。
+3. `index.html` 用于公开展示，另外两页用于单独引用和讲解。
